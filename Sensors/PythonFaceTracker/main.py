@@ -81,11 +81,12 @@ from AngleBuffer import AngleBuffer
 #-----------------------------------------------------------------------------------------------------------------------------------
 # ADHD Custom params
 frametime = 0.1 # How long between each frame (in sec)
-lookThreshhold = 50 # How many consecutive frames before a distraction is triggered?
+lookThreshhold = 20 # How many consecutive frames before a distraction is triggered?
 
 # ADHD Vars
 distractionCount = 0 # Counts how many distractions have occoured this session
 lookCounter = 0 # Counts how many consecutive frames face_look is not 'Forward'
+startTime = time.time() # used to keep track of runtime
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 # Parameters Documentation
@@ -382,10 +383,10 @@ def blinking_ratio(landmarks):
 
 # Initializing MediaPipe face mesh and camera
 if PRINT_DATA:
-    print("Initializing the face mesh and camera...")
+    # print("Initializing the face mesh and camera...")
     if PRINT_DATA:
         head_pose_status = "enabled" if ENABLE_HEAD_POSE else "disabled"
-        print(f"Head pose estimation is {head_pose_status}.")
+        # print(f"Head pose estimation is {head_pose_status}.")
 
 mp_face_mesh = mp.solutions.face_mesh.FaceMesh(
     max_num_faces=1,
@@ -654,7 +655,7 @@ try:
                 lookCounter += 1
                 if lookCounter >= lookThreshhold:
                     distractionCount += 1
-                    print("Distraction detected")
+                    print(f"It has been {int(time.time() - startTime)} total minutes, the user seems distracted\n")
                     lookCounter = 0
             else: lookCounter = 0
 
@@ -680,7 +681,8 @@ try:
         if key == ord('c'):
             initial_pitch, initial_yaw, initial_roll = pitch, yaw, roll
             if PRINT_DATA:
-                print("Head pose recalibrated.")
+                pass
+                # print("Head pose recalibrated.")
                 
         # Inside the main loop, handle the 'r' key press
         if key == ord('r'):
@@ -695,7 +697,8 @@ try:
         # Exit on 'q' key press
         if key == ord('q'):
             if PRINT_DATA:
-                print("Exiting program...")
+                pass
+                # print("Exiting program...")
             break
         
 except Exception as e:
@@ -706,7 +709,8 @@ finally:
     cv.destroyAllWindows()
     iris_socket.close()
     if PRINT_DATA:
-        print("Program exited successfully.")
+        pass
+        # print("Program exited successfully.")
 
     # Writing data to CSV file
     if LOG_DATA and IS_RECORDING:
