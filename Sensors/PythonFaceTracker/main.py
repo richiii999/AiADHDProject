@@ -656,6 +656,7 @@ try:
                 if lookCounter >= lookThreshhold:
                     distractionCount += 1
                     print(f"It has been {int(time.time() - startTime)} total minutes, the user seems distracted\n")
+                    
                     lookCounter = 0
             else: lookCounter = 0
 
