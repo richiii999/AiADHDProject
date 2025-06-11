@@ -5,19 +5,17 @@
 import subprocess
 import time
 
-# pexpect # Used to manage subprocesses so we can write multiple times to the
-
 startTime = time.time()
 
 faceTrackerFile = open('faceTracker.txt', 'r+')
 # faceTrackerFile.write("test\ntest")
 llmFile = open('llmFile.txt', 'r+')
 
-faceTracker = subprocess.Popen(['python','-u', './Sensors/PythonFaceTracker/main.py'], stdin=subprocess.PIPE, stdout=faceTrackerFile)
-llm = subprocess.Popen('ollama run llama3.2', stdin=subprocess.PIPE, shell=True, text=True)
+faceTracker = subprocess.Popen(['python','-u', './Sensors/PythonFaceTracker/main.py'], stdin=subprocess.PIPE, stdout=faceTrackerFile, universal_newlines=True)
+llm = subprocess.Popen('ollama run llama3.2', stdin=subprocess.PIPE, shell=True, text=True, universal_newlines=True)
 
 time.sleep(8) # Wait for facetracker to fully start
-for i in range(2):
+while faceTracker.poll() == None:
     time.sleep(3)
     print(f"Time={int(time.time()-startTime)}")
     
@@ -25,12 +23,15 @@ for i in range(2):
     out = faceTrackerFile.readlines()[-1] # Get most recent output (TODO eventually change to seeking)
     print(str(out)) 
 
-    llm.stdin.write(out + '\n') # Write the facetracker output to the LLM's input
+    llm.stdin.write(out + '\r\n') # Write the facetracker output to the LLM's input
     llm.stdin.flush()
 
-llm.stdin.write("print all previous input, but start each new line with '--'\n Do not make a script or command, just print the input")
+llm.stdin.write("print all previous input\nDo not make a script or command, just print the input and nothing else.")
 
 faceTrackerFile.close()
 llmFile.close()
 
-# TODO turn off subprocess from this file
+faceTracker.kill()
+
+time.sleep(10)
+llm.kill()
