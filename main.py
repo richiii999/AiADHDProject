@@ -3,28 +3,29 @@
 
 import sys
 import time
-import subprocess
 
-import pexpect
+import pexpect # Module which manages subprocess I/O
 
-sleepytime = 2
+initDelay = 10 # Initial delay after starting LLM to wait for it to be ready for input
+iterDelay = 5 # Increase delay for slower computers and/or to slow down iterations of prompting
 startTime = time.time()
 
 faceTrackerFile = open('faceTracker.txt', 'r+')
-llmFile = open('llmFile.txt', 'w')
+llmFile = open('llmFile.txt', 'r+')
 
-llm = pexpect.spawn('ollama run llama3.2:1b', encoding='utf-8')
-llm.logfile_send = sys.stdout # redirect all llm output to stdout
+faceTracker = pexpect.spawn('python -u ./Sensors/PythonFaceTracker/main.py', encoding='utf-8', logfile=faceTrackerFile)
+llm = pexpect.spawn('ollama run llama3.2:1b', encoding='utf-8', logfile=sys.stdout) # Change logfile param to redirect outputs (e.g. to a file instead)
 
-time.sleep(sleepytime)
-while True:
+time.sleep(initDelay)
+while faceTracker.status:
+    # Get most recent output (TODO eventually change to seeking from end)
     faceTrackerFile.seek(0)
-    out = faceTrackerFile.readlines()[-1] # Get most recent output (TODO eventually change to seeking from end)
+    out = faceTrackerFile.readlines()[-1]
 
     llm.sendline(out) # Write the facetracker output to the LLM's input
-    llm.expect('>>>')
+    llm.expect('>>>') # Stream the AI's output while awaiting the end of the response
 
-faceTrackerFile.close()
+faceTrackerFile.close() # Close files and terminate
 llmFile.close()
-
+faceTracker.terminate()
 llm.terminate()
