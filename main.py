@@ -27,7 +27,16 @@ sensors = [ # Sensor processes which record data to be passed to the AI
     # pexpect.spawn('ollama run llava', encoding='utf-8', logfile=logFiles[2])
 ]
 
-time.sleep(initDelay) # Main loop
+# Initialization of LLM (sensors also starting up during this time)
+time.sleep(initDelay) 
+with open('initPrompt.txt', 'r') as initPrompt:
+    temp = llm.logfile
+    llm.logfile = llmFile # Discard initial response
+    llm.sendline(initPrompt) # TODO I think this input is too long, need to split over multiple sends
+    llm.expect('>>>')
+    llm.logfile = temp
+
+# Main loop
 while sensors[0].status: # TODO how to close? For now just 'q' on FaceTracker to close everything
     sensorData = f"Time = {time.time() - startTime} minutes, Aggregated Sensor data (Each sensor on newline):"
     for f in logFiles: # Get most recent output per sensor 
