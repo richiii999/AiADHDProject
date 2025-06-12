@@ -16,31 +16,30 @@ llmFile = open('llmFile.txt', 'r+') # If needed, change logfile param to redirec
 llm = pexpect.spawn('ollama run llama3.2', encoding='utf-8', logfile=sys.stdout)
 
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
-    open('faceTracker.txt', 'r+')
-    # Sensor 2 file ...
-    # Sensor 3 file ...
+    open('faceTracker.txt', 'r+'),
+    open('gazeTracker.txt', 'r+'),
+    open('llavaOutput.txt', 'r+') # TODO does llava output go over multiple newlines? How to separate
 ]
 
-sensors = [ # Sensors which record data to be passed to the AI
+sensors = [ # Sensor processes which record data to be passed to the AI
     pexpect.spawn('python -u ./Sensors/PythonFaceTracker/main.py', encoding='utf-8', logfile=logFiles[0])
-    # Sensor 2 process ...
-    # Sensor 3 process ...
+    # pexpect.spawn('python -u ./Sensors/PythonGazeTracker/main.py', encoding='utf-8', logfile=logFiles[1])
+    # pexpect.spawn('ollama run llava', encoding='utf-8', logfile=logFiles[2])
 ]
 
 time.sleep(initDelay) # Main loop
 while sensors[0].status: # TODO how to close? For now just 'q' on FaceTracker to close everything
-    sensorData = "Aggregated Sensor data (Each sensor on newline):"
+    sensorData = f"Time = {time.time() - startTime} minutes, Aggregated Sensor data (Each sensor on newline):"
     for f in logFiles: # Get most recent output per sensor 
         f.seek(0) # TODO eventually change to seeking from end of file instead of start
         sensorData += f.readlines()[-1]
 
-    # TODO Multiline prompt has to start & end with triple quotes (""") I believe
-    llm.sendline(sensorData) # Write the facetracker output to the LLM's input
+    llm.sendline(sensorData) # TODO Multiline prompt has to start & end with triple quotes (""") I believe
     llm.expect('>>>') # Stream the AI's output while awaiting the end of the response
 
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 
-llmFile.close() # Close files and terminate
+llmFile.close() # Close files and terminate procs
 llm.terminate()
 for f in logFiles: f.close() 
 for s in sensors: s.terminate()
