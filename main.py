@@ -1,37 +1,30 @@
 # main.py
 # Manages the sensors talking to the LLM via subprocesses
 
-# import os
-import subprocess
+import sys
 import time
+import subprocess
 
+import pexpect
+
+sleepytime = 2
 startTime = time.time()
 
 faceTrackerFile = open('faceTracker.txt', 'r+')
-# faceTrackerFile.write("test\ntest")
-llmFile = open('llmFile.txt', 'r+')
+llmFile = open('llmFile.txt', 'w')
 
-faceTracker = subprocess.Popen(['python','-u', './Sensors/PythonFaceTracker/main.py'], stdin=subprocess.PIPE, stdout=faceTrackerFile, universal_newlines=True)
-llm = subprocess.Popen('ollama run llama3.2', stdin=subprocess.PIPE, shell=True, text=True, universal_newlines=True)
+llm = pexpect.spawn('ollama run llama3.2:1b', encoding='utf-8')
+llm.logfile_send = sys.stdout # redirect all llm output to stdout
 
-time.sleep(8) # Wait for facetracker to fully start
-while faceTracker.poll() == None:
-    time.sleep(3)
-    print(f"Time={int(time.time()-startTime)}")
-    
+time.sleep(sleepytime)
+while True:
     faceTrackerFile.seek(0)
-    out = faceTrackerFile.readlines()[-1] # Get most recent output (TODO eventually change to seeking)
-    print(str(out)) 
+    out = faceTrackerFile.readlines()[-1] # Get most recent output (TODO eventually change to seeking from end)
 
-    llm.stdin.write(out + '\r\n') # Write the facetracker output to the LLM's input
-    llm.stdin.flush()
-
-llm.stdin.write("print all previous input\nDo not make a script or command, just print the input and nothing else.")
+    llm.sendline(out) # Write the facetracker output to the LLM's input
+    llm.expect('>>>')
 
 faceTrackerFile.close()
 llmFile.close()
 
-faceTracker.kill()
-
-time.sleep(10)
-llm.kill()
+llm.terminate()
