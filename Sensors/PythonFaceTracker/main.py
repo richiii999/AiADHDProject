@@ -86,7 +86,6 @@ lookThreshhold = 20 # How many consecutive frames before a distraction is trigge
 # ADHD Vars
 distractionCount = 0 # Counts how many distractions have occoured this session
 lookCounter = 0 # Counts how many consecutive frames face_look is not 'Forward'
-startTime = time.time() # used to keep track of runtime
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 # Parameters Documentation
@@ -655,7 +654,7 @@ try:
                 lookCounter += 1
                 if lookCounter >= lookThreshhold:
                     distractionCount += 1
-                    print(f"It has been {int(time.time() - startTime)} total minutes, the user seems distracted")
+                    print(f"The user seems distracted")
                     
                     lookCounter = 0
             else: lookCounter = 0
