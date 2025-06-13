@@ -15,6 +15,15 @@ startTime = time.time()
 llmFile = open('llmFile.txt', 'r+') # If needed, change logfile param to redirect outputs to this file instead
 llm = pexpect.spawn('ollama run llama3.2', encoding='utf-8', logfile=sys.stdout)
 
+# PROMPTING
+# API prompt format, can do pexpect.run(f"vvv{prompt}")
+    # curl http://localhost:11434/api/generate -d '{
+    # "model": "llama3.2:3b-instruct-fp16",
+    # "prompt": "Why is the sky blue?", 
+    # "stream": false
+    # }'
+# No response back, it stays on the webui
+
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
     open('faceTracker.txt', 'r+'),
     open('gazeTracker.txt', 'r+'),
@@ -38,14 +47,13 @@ with open('initPrompt.txt', 'r') as initPrompt:
 
 # Main loop
 while sensors[0].status: # TODO how to close? For now just 'q' on FaceTracker to close everything
-    sensorData = f"Time = {time.time() - startTime} minutes, Aggregated Sensor data (Each sensor on newline):"
+    sensorData = f"Time = {time.time() - startTime} minutes, Aggregated Sensor data (Each sensor on newline):\n" # TODO remove time from facetracker
     for f in logFiles: # Get most recent output per sensor 
         f.seek(0) # TODO eventually change to seeking from end of file instead of start
         sensorData += f.readlines()[-1]
 
-    llm.sendline(sensorData) # TODO Multiline prompt has to start & end with triple quotes (""") I believe
-    llm.expect('>>>') # Stream the AI's output while awaiting the end of the response
-
+    llm.sendline(initPrompt) # TODO I think this input is too long, need to split over multiple sends
+    llm.expect('>>>')
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 
 llmFile.close() # Close files and terminate procs
