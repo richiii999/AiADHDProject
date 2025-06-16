@@ -12,7 +12,7 @@ initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for 
 iterDelay = 5 # delay for each iteration of prompting
 startTime = time.time()
 
-# Servers
+# Servers # TODO currently you must start the servers manually, idk why these do not work
 # pexpect.spawn('DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve')
 # pexpect.spawn('ollama serve')
 
@@ -28,7 +28,7 @@ sensors = [ # Sensor processes which record data to be passed to the AI
     # pexpect.spawn('python -u ./Sensors/PythonGazeTracker/main.py', encoding='utf-8', logfile=logFiles[1])
 ]
 
-KB_ID = '' # Used to refer to the KB in prompts, updated when KB files are uploaded
+KB_ID = API.kb_id # Used to refer to the KB in prompts, updated when KB files are uploaded
 KB = [ # Knowledge base, for RAG
     './KB/TAD.pdf'
     #'./KB/OB_CH13/pptx'
@@ -43,9 +43,7 @@ time.sleep(initDelay) # give servers & sensors time to start up
 # Learning material upload & KB creation
 for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-    KB_ID = API.add_file_to_knowledge(file_ID)['id']
-    #print(file_ID)
-    #print(KB_ID)
+    API.add_file_to_knowledge(file_ID)
 
 ### Main loop
 while True: # TODO how to close? For now just 'q' on FaceTracker to close everything
@@ -55,10 +53,9 @@ while True: # TODO how to close? For now just 'q' on FaceTracker to close everyt
         sensorData += f.readlines()[-1]
 
     # Prompt
-    prompt = "generate a 5-question multiple choice quiz based on the provided file",
-    response = API.chat_with_collection(prompt, KB_ID)
-    print(response)
-    #print(response['choices'][0]['message']['content'])
+    prompt = "generate a 3-question multiple choice quiz based on the provided file",
+    response = API.chat_with_collection(prompt,KB_ID)
+    print(response['choices'][0]['message']['content'])
 
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 
