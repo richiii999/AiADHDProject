@@ -2,11 +2,10 @@
 # From https://docs.openwebui.com/getting-started/api-endpoints
 
 import requests
-import json # requests are formatted as json
 
 localHostPort = "8080"
 model = "llama3.2:latest"
-kb_id = "bc6b1026-9278-4729-9c8f-e00f1eda88d8"
+kb_id = "bc6b1026-9278-4729-9c8f-e00f1eda88d8" # 'asdf' KB on webui
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJlMzE3OGY1LThhMGQtNDRkMi1hN2E0LWJkNTgxMmVkYjJlYiJ9.f98vyt8s0BBz3N7dzBs2u32N2W9bFpELDbHFoKDZzck'
 
 def chat_with_model(prompt, token=adminToken):
