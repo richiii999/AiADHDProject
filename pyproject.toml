@@ -1,0 +1,10 @@
+[project]
+name = "aiadhdproject"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "open-webui>=0.6.5",
+    "pexpect>=4.9.0",
+]
