@@ -5,7 +5,7 @@
 import requests
 
 localHostPort = "8080"
-model = "llama3.2:latest"
+model = "ADHD:latest" # Default: "llama3.2:latest"
 #base = "llama3.2:latest"
 kb_id = "45a699a8-88a1-4898-b73b-d94a7e7400f7" # KBID: 
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViZGY2YWQ1LWIwNzYtNGQ4Yy1hNjJkLWFjMDcxMDEyZDRlYyJ9.WjbumeUxhb0DOV5GSYHafUnRrlXVUqyA6YbS9leDnPY'

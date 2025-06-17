@@ -7,8 +7,15 @@ import time
 import pexpect # Module which manages subprocess I/O (ollama & webui servers)
 import API # Contains API calls to webui
 
+def GetSensorData() -> str:
+    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
+    for f in logFiles: # Get most recent output per sensor 
+        f.seek(0) # TODO eventually change to seeking from end of file instead of start
+        sensorData += f.readlines()[-1]
+    return sensorData
+
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
-initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
+initDelay = 10 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 5 # delay for each iteration of prompting
 startTime = time.time()
 
@@ -36,28 +43,33 @@ KB = [ # Knowledge base, for RAG
 ]
 
 ### Initialization of LLM 
-time.sleep(initDelay) # give servers & sensors time to start up
-#with open("./Logs/initPrompt.txt", 'r') as f: # System prompt from file
-#    prompt = ""
-#    for line in f.readlines(): prompt += line
-#    API.system_prompt(prompt)
+sysPrompt = ""
+with open("./Logs/initPrompt2.txt", 'r') as f: 
+    for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
+with open("./create.txt") as f: # Dumb way of doing it, but due to string formatting issues this is a workaround
+    cmd = f.readline()
+    pexpect.run(cmd)
+
+time.sleep(initDelay) # give servers & sensors time to start up
 ### Learning material upload & KB creation
-for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
-    file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-    API.add_file_to_knowledge(file_ID)
+#for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
+    #file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+    #API.add_file_to_knowledge(file_ID)
 
 ### Main loop
 while True: # TODO how to close? For now just 'q' on FaceTracker to close everything
-    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
-    for f in logFiles: # Get most recent output per sensor 
-        f.seek(0) # TODO eventually change to seeking from end of file instead of start
-        sensorData += f.readlines()[-1]
+    #sensorData = GetSensorData()
 
-    # Prompt
-    prompt = "generate a 3-question multiple choice quiz based on the provided file",
-    response = API.chat_with_collection(prompt,KB_ID)
-    print(response['choices'][0]['message']['content'])
+    ### Chat with collection
+    #prompt = "generate a 3-question multiple choice quiz based on the provided file",
+    #response = API.chat_with_collection(prompt,KB_ID)
+    #print(response['choices'][0]['message']['content'])
+    #print(response)
+
+    ### Chat with model
+    print(API.chat_with_model("who are you"))
+
 
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 
