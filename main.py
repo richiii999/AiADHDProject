@@ -37,10 +37,12 @@ KB = [ # Knowledge base, for RAG
 
 ### Initialization of LLM 
 time.sleep(initDelay) # give servers & sensors time to start up
+#with open("./Logs/initPrompt.txt", 'r') as f: # System prompt from file
+#    prompt = ""
+#    for line in f.readlines(): prompt += line
+#    API.system_prompt(prompt)
 
-# TODO set system prompt
-
-# Learning material upload & KB creation
+### Learning material upload & KB creation
 for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
     API.add_file_to_knowledge(file_ID)
