@@ -11,7 +11,6 @@ kb_id = "45a699a8-88a1-4898-b73b-d94a7e7400f7" # KBID:
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViZGY2YWQ1LWIwNzYtNGQ4Yy1hNjJkLWFjMDcxMDEyZDRlYyJ9.WjbumeUxhb0DOV5GSYHafUnRrlXVUqyA6YbS9leDnPY'
 # Admin Token: Click bottom left > Settings > Account > API Keys (show) > JWT Token (show)
 
-
 def chat_with_model(prompt, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
@@ -77,21 +76,3 @@ def chat_with_collection(prompt, collection_id, token=adminToken):
     }
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
-
-
-### Testing stuff
-
-
-#def create_model(prompt, token=adminToken):
-#    url = f'http://localhost:{localHostPort}/api/create'
-#    headers = {
-#        'Authorization': f'Bearer {token}',
-#        'Content-Type': 'application/json'
-#    }
-#    data = {
-#        "model": model,
-#        "from": base,
-#        'system': f"\"{prompt}\"",
-#    }
-#    response = requests.post(url, headers=headers, json=data)
-#    return response.json()
