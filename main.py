@@ -26,14 +26,9 @@ logFiles = [ # Log files, sensor output is periodically read from here and given
 
 
 sensors = [ # Sensor processes which record data to be passed to the AI
-    # pexpect.spawn('python -u ./Sensors/PythonFaceTracker/main.py', encoding='utf-8', logfile=logFiles[0])
+    subprocess.run(["python3", "./Sensors/PythonFaceTracker/main.py"], capture_output=True, text=True, stdout=sys.stdout)
     # pexpect.spawn('python -u ./Sensors/GazeTracking/main.py', encoding='utf-8', logfile=logFiles[1])
 ]
-
-#pexpect.spawn('python -u ./Sensors/PythonFaceTracker/main.py > ')
-
-result = subprocess.run(["python3", "./Sensors/PythonFaceTracker/main.py"], capture_output=True, text=True)
-print(result.stdout)
 
 KB_ID = API.kb_id # Used to refer to the KB in prompts, updated when KB files are uploaded
 KB = [ # Knowledge base, for RAG
