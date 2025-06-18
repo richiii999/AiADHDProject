@@ -15,11 +15,26 @@ import asyncio
 from Sensors.PythonFaceTracker.AngleBuffer import AngleBuffer
 from Sensors.GazeTracking.gaze_tracking import GazeTracking
 from multiprocessing import Process
+class SplitStdout:
+    def __init__(self, filename):
+        self.original_stdout = sys.stdout  # Save the original stdout
+        self.file = open(filename, 'w')  # Open a file for writing
+
+    def write(self, data):
+        self.original_stdout.write(data)  # Write to the original stdout
+        self.file.write(data)            # Write to the file
+
+    def flush(self):
+        self.original_stdout.flush()
+        self.file.flush()
+
+    def close(self):
+        self.file.close()
 
 
 #from gaze_tracking import GazeTracking
 
-webcam = cv2.VideoCapture(0)
+webcam = cv2.VideoCapture(0) #INstance of the camera
 
 async def gaze_estimator(camera):
     gaze = GazeTracking()
@@ -447,7 +462,7 @@ async def face_estimator(camera):
                     lookCounter += 1
                     if lookCounter >= lookThreshhold:
                         distractionCount += 1
-                        print(f"The user seems distracted")
+                        print(f"The user seems distracted", flush=True)
                         lookCounter = 0
                 else: lookCounter = 0
 
@@ -482,9 +497,16 @@ thread2.start()"""
 # TODO Welp it says something about passing in a VIRTUAL CAMERA for both instances to run at the same time.
 # Gonna try it and see how it goes
 
+
+sys.stdout = SplitStdout("faceTracker.txt")
+
 async def multi_thread_this():
     run_multiple_tasks_at_once = await asyncio.gather(face_estimator(webcam), gaze_estimator(webcam))
+
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(multi_thread_this())
 
+sys.stdout.close()
+sys.stdout = sys.__stdout__ 

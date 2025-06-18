@@ -8,6 +8,22 @@ import cv2
 import pexpect # Module which manages subprocess I/O (ollama & webui servers)
 import API # Contains API calls to webui
 
+class SplitStdout:
+    def __init__(self, filename):
+        self.original_stdout = sys.stdout  # Save the original stdout
+        self.file = open(filename, 'w')  # Open a file for writing
+
+    def write(self, data):
+        self.original_stdout.write(data)  # Write to the original stdout
+        self.file.write(data)            # Write to the file
+
+    def flush(self):
+        self.original_stdout.flush()
+        self.file.flush()
+
+    def close(self):
+        self.file.close()
+
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 5 # delay for each iteration of prompting
@@ -21,13 +37,14 @@ startTime = time.time()
 
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
     open('./Logs/faceTracker.txt', 'r+'),
-    open('./Logs/gazeTracker.txt', 'r+'),
+    open('./Logs/gazeTracker.txt', 'r+')
 ]
 
 
 sensors = [ # Sensor processes which record data to be passed to the AI
-    subprocess.run(["python3", "./Sensors/PythonFaceTracker/main.py"], capture_output=True, text=True, stdout=sys.stdout)
-    # pexpect.spawn('python -u ./Sensors/GazeTracking/main.py', encoding='utf-8', logfile=logFiles[1])
+    subprocess.Popen(["python", "./Sensors/PythonFaceTracker/main.py"], stdout=SplitStdout('faceTracker.txt')),
+
+    #subprocess.Popen(["python","./Sensors/GazeTracking/example.py"], stdout=sys.stdout)
 ]
 
 KB_ID = API.kb_id # Used to refer to the KB in prompts, updated when KB files are uploaded
@@ -43,21 +60,21 @@ time.sleep(initDelay) # give servers & sensors time to start up
 # TODO set system prompt
 
 # Learning material upload & KB creation
-for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
-    file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-    API.add_file_to_knowledge(file_ID)
+# for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
+#     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+#     API.add_file_to_knowledge(file_ID)
 
 ### Main loop
 while True: # TODO how to close? For now just 'q' on FaceTracker to close everything
-    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
-    for f in logFiles: # Get most recent output per sensor 
-        f.seek(0) # TODO eventually change to seeking from end of file instead of start
-        sensorData += f.readlines()[-1]
+    # sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
+    # for f in logFiles: # Get most recent output per sensor 
+    #     f.seek(0) # TODO eventually change to seeking from end of file instead of start
+    #     sensorData += f.readlines()[-1]
 
-    # Prompt
-    prompt = "generate a 3-question multiple choice quiz based on the provided file",
-    response = API.chat_with_collection(prompt,KB_ID)
-    print(response['choices'][0]['message']['content'])
+    # # Prompt
+    # prompt = "generate a 3-question multiple choice quiz based on the provided file",
+    # response = API.chat_with_collection(prompt,KB_ID)
+    # print(response['choices'][0]['message']['content'])
 
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 
