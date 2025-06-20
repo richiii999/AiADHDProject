@@ -15,8 +15,6 @@ import asyncio
 from Sensors.PythonFaceTracker.AngleBuffer import AngleBuffer
 from Sensors.GazeTracking.gaze_tracking import GazeTracking
 from multiprocessing import Process
-
-
 class SplitStdout:
     def __init__(self, filename):
         self.original_stdout = sys.stdout  # Save the original stdout
@@ -39,9 +37,6 @@ class SplitStdout:
 webcam = cv2.VideoCapture(0) #INstance of the camera
 
 async def gaze_estimator(camera):
-    count = 0
-    currLx, currLy = 0, 0
-    currRx, currRy = 0, 0
     gaze = GazeTracking()
     webcam = camera
 
@@ -71,26 +66,6 @@ async def gaze_estimator(camera):
         right_pupil = gaze.pupil_right_coords()
         cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
         cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-
-
-        if(str(left_pupil) != "None" and str(right_pupil) != "None"):
-            leftx, lefty= str(left_pupil).split(",")
-            rightx, righty = str(right_pupil).split(",")
-            leftx = int(leftx[1:])
-            lefty = int(lefty[:-1])
-            rightx= int(rightx[1:])
-            righty= int(righty[:-1])
-
-            if((leftx-4<currLx<leftx+4) and (lefty-4<currLy<lefty+4) and (rightx-4<currRx<rightx+4) and (righty-4<currRy<righty+4)):
-                count +=1
-            else:
-                count =0
-                currLx, currLy = leftx, lefty
-                currRx, currRy = rightx, righty
-
-            if(count==10):
-                print("The user is zoned out")
-                time.sleep(5)
 
         cv2.imshow("Demo", frame)
 

@@ -5,6 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "mediapipe>=0.10.21",
+    "numpy>=1.26.4",
     "open-webui>=0.6.5",
+    "opencv-python>=4.11.0.86",
     "pexpect>=4.9.0",
+    "scipy>=1.15.3",
 ]

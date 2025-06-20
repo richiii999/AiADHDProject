@@ -4,34 +4,19 @@
 import sys
 import subprocess
 import time
-import cv2
+
+import cv2 # Camera
 import pexpect # Module which manages subprocess I/O (ollama & webui servers)
 import API # Contains API calls to webui
 
-class SplitStdout:
-    def __init__(self, filename):
-        self.original_stdout = sys.stdout  # Save the original stdout
-        self.file = open(filename, 'w')  # Open a file for writing
-
-    def write(self, data):
-        self.original_stdout.write(data)  # Write to the original stdout
-        self.file.write(data)            # Write to the file
-
-    def flush(self):
-        self.original_stdout.flush()
-        self.file.flush()
-
-    def close(self):
-        self.file.close()
-
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
+startTime = time.time()
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 5 # delay for each iteration of prompting
-startTime = time.time()
 
-# Servers # TODO currently you must start the servers manually, idk why these do not work
+### Servers # TODO currently you must start the servers manually, idk why these do not work
 # pexpect.spawn('DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve')
-# pexpect.spawn('ollama serve')
+# pexpect.spawn('ollama serve') # Ollama automatically runs on Ubuntu, no need to serve
 
 # The AI model itself is accessed via API
 
@@ -41,40 +26,49 @@ logFiles = [ # Log files, sensor output is periodically read from here and given
 ]
 
 
-sensors = [ # Sensor processes which record data to be passed to the AI
-    subprocess.Popen(["python", "./Sensors/PythonFaceTracker/main.py"], stdout=SplitStdout('faceTracker.txt')),
-
-    #subprocess.Popen(["python","./Sensors/GazeTracking/example.py"], stdout=sys.stdout)
+cmds = [ # Commands to run each sensor process
+    'python ./Sensors/PythonFaceTracker/test2.py', 
+    'python ./Sensors/PythonGazeTracker/main.py'
 ]
 
-KB_ID = API.kb_id # Used to refer to the KB in prompts, updated when KB files are uploaded
+# Sensor processes which record data to be passed to the AI
+sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))]
+
+### RAG
 KB = [ # Knowledge base, for RAG
-    './KB/TAD.pdf'
-    #'./KB/OB_CH13/pptx'
+    # './KB/TAD.pdf'
+    './KB/OB_CH13.pptx'
     #'./KB/OB_CH14/pptx'
 ]
 
 ### Initialization of LLM 
-time.sleep(initDelay) # give servers & sensors time to start up
+# Set system prompt
+sysPrompt = ""
+with open("./Logs/initPrompt2.txt", 'r') as f: 
+    for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-# TODO set system prompt
+with open("./create.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
+
 
 # Learning material upload & KB creation
-# for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
-#     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-#     API.add_file_to_knowledge(file_ID)
+for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
+    file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+    API.add_file_to_knowledge(file_ID)
 
 ### Main loop
+time.sleep(initDelay) # give servers & sensors time to start up
 while True: # TODO how to close? For now just 'q' on FaceTracker to close everything
-    # sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
-    # for f in logFiles: # Get most recent output per sensor 
-    #     f.seek(0) # TODO eventually change to seeking from end of file instead of start
-    #     sensorData += f.readlines()[-1]
+    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
+    for f in logFiles: # Get most recent output per sensor 
+        f.seek(0) # TODO eventually change to seeking from end of file instead of start
+        sensorData += f.readlines()[-1]
+    print(sensorData)
 
-    # # Prompt
-    # prompt = "generate a 3-question multiple choice quiz based on the provided file",
-    # response = API.chat_with_collection(prompt,KB_ID)
-    # print(response['choices'][0]['message']['content'])
+    # Prompt
+    response = API.chat_with_collection(sensorData,API.kb_id)
+    try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page, else 'model not found'
+    except: print(response)
+
 
     time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
 

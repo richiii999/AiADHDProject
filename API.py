@@ -5,9 +5,10 @@
 import requests
 
 localHostPort = "8080"
-model = "llama3.2:latest"
-kb_id = "bc6b1026-9278-4729-9c8f-e00f1eda88d8" # 'asdf' KB on webui
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJlMzE3OGY1LThhMGQtNDRkMi1hN2E0LWJkNTgxMmVkYjJlYiJ9.f98vyt8s0BBz3N7dzBs2u32N2W9bFpELDbHFoKDZzck'
+model = "ADHD:latest" # Default: "llama3.2:latest"
+#base = "llama3.2:1b"
+kb_id = "63d72707-8d99-4b09-a331-2c1ce85953ac" # 'asdf' KB on webui
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 
 def chat_with_model(prompt, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
