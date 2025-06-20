@@ -27,8 +27,8 @@ logFiles = [ # Log files, sensor output is periodically read from here and given
 
 
 cmds = [ # Commands to run each sensor process
-    'python ./Sensors/PythonFaceTracker/test2.py', 
-    'python ./Sensors/PythonGazeTracker/main.py'
+    'python ./Sensors/PythonFaceTracker/OutputTest.py', 
+    'python ./Sensors/PythonGazeTracker/OutputTest.py'
 ]
 
 # Sensor processes which record data to be passed to the AI
@@ -44,10 +44,10 @@ KB = [ # Knowledge base, for RAG
 ### Initialization of LLM 
 # Set system prompt
 sysPrompt = ""
-with open("./Logs/initPrompt2.txt", 'r') as f: 
+with open("./LLM/initPrompt.txt", 'r') as f: 
     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-with open("./create.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
+with open("./LLM/create.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
 
 
 # Learning material upload & KB creation
