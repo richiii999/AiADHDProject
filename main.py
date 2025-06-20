@@ -51,13 +51,13 @@ with open("./LLM/create.txt") as f: pexpect.run(f.readline()) # Dumb way, but du
 
 
 # Learning material upload & KB creation
-for path in KB: # TODO, duplicate file uploads mess this up. have to manually remove from webui each time
+for path in KB:
     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
     API.add_file_to_knowledge(file_ID)
 
 ### Main loop
 time.sleep(initDelay) # give servers & sensors time to start up
-while True: # TODO how to close? For now just 'q' on FaceTracker to close everything
+while True: # TODO how to close?
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
     for f in logFiles: # Get most recent output per sensor 
         f.seek(0) # TODO eventually change to seeking from end of file instead of start
