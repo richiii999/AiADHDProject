@@ -27,8 +27,8 @@ logFiles = [ # Log files, sensor output is periodically read from here and given
 
 
 cmds = [ # Commands to run each sensor process
-    'python ./Sensors/PythonFaceTracker/OutputTest.py', 
-    'python ./Sensors/PythonGazeTracker/OutputTest.py'
+    'python ./Sensors/PythonFaceTracker/main.py', # Default: main.py, alt: OutputTest.py (for both)
+    'python ./Sensors/PythonGazeTracker/example.py' # Default: example.py 
 ]
 
 # Sensor processes which record data to be passed to the AI
@@ -43,17 +43,17 @@ KB = [ # Knowledge base, for RAG
 
 ### Initialization of LLM 
 # Set system prompt
-sysPrompt = ""
-with open("./LLM/initPrompt.txt", 'r') as f: 
-    for line in f.readlines(): sysPrompt += line.replace('\n',' ')
+# sysPrompt = ""
+# with open("./LLM/initPrompt.txt", 'r') as f: 
+#     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-with open("./LLM/create.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
+# with open("./LLM/create.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
 
 
-# Learning material upload & KB creation
-for path in KB:
-    file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-    API.add_file_to_knowledge(file_ID)
+# # Learning material upload & KB creation
+# for path in KB:
+#     file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+#     API.add_file_to_knowledge(file_ID)
 
 ### Main loop
 time.sleep(initDelay) # give servers & sensors time to start up
@@ -65,9 +65,9 @@ while True: # TODO how to close?
     print(sensorData)
 
     # Prompt
-    response = API.chat_with_collection(sensorData,API.kb_id)
-    try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page, else 'model not found'
-    except: print(response)
+    # response = API.chat_with_collection(sensorData,API.kb_id)
+    # try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page, else 'model not found'
+    # except: print(response)
 
 
     time.sleep(iterDelay)# Delay AFTER response (So you can actually read it)

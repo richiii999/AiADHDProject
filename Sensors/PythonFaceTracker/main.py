@@ -13,11 +13,12 @@ from AngleBuffer import AngleBuffer
 #-----------------------------------------------------------------------------------------------------------------------------------
 # ADHD Custom params
 frametime = 0.1 # How long between each frame (in sec)
-lookThreshhold = 20 # How many consecutive frames before a distraction is triggered?
+lookThreshhold = 20 # How many consecutive frames before a status update is triggered?
 
 # ADHD Vars
 distractionCount = 0 # Counts how many distractions have occoured this session
-lookCounter = 0 # Counts how many consecutive frames face_look is not 'Forward'
+focusCounter = 0 # Counts how many consecutive frames face_look is 'Forward'
+distractCounter = 0 # Counts how many consecutive frames face_look is NOT 'Forward'
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 ## User-Specific Measurements
@@ -389,14 +390,22 @@ try:
 
             # ADHD Distraction Detection Logic
             time.sleep(frametime) # Live video is not needed, so only capture camera every so often (<1 sec per frame)
-            if face_looks != 'Forward':
-                lookCounter += 1
-                if lookCounter >= lookThreshhold:
-                    distractionCount += 1
-                    print(f"The user seems distracted")
-                    lookCounter = 0
-            else: lookCounter = 0
+            if face_looks != 'Forward': # Distracted
+                focusCounter = 0 # Reset focus
+                distractCounter += 1 # Increment Distraction
 
+                if distractCounter >= lookThreshhold:
+                    print(f"FaceTracker: The user seems distracted", flush=True)
+                    distractCounter = 0 # BUG: If user switches face positions quickly, neither counter will reach threshhold
+                    distractionCount += 1 # increment total distractions this session
+
+            else: 
+                distractCounter = 0 # Reset distraction
+                focusCounter += 1 # Increment focus
+
+                if focusCounter >= lookThreshhold:
+                    print(f"FaceTracker: The user seems focused", flush=True)
+                    focusCounter = 0
 
         # Displaying the processed frame
         cv.imshow("Eye Tracking", frame)
