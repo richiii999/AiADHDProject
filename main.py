@@ -70,7 +70,7 @@ while True: # TODO how to close?
     except: print(response)
 
 
-    time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
+    time.sleep(iterDelay)# Delay AFTER response (So you can actually read it)
 
 for f in logFiles: f.close() # Close files and terminate procs
 for s in sensors: s.terminate()
