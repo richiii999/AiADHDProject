@@ -17,7 +17,7 @@ zonedOutThreshhold = 20 # How many consecutive frames count as being 'zoned out'
 currLx, currLy = 0, 0 # eye position trackers
 currRx, currRy = 0, 0
 
-camNum = 9 # CamNum set by making a virtual cam 'sudo modprobe v4l2loopback devices=1'
+camNum = 9 # CamNum set by making a virtual cam via v4l2loopback
 gaze = GazeTracking()
 webcam = cv2.VideoCapture(camNum)
 

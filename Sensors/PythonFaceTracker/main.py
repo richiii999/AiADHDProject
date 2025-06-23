@@ -20,7 +20,7 @@ distractionCount = 0 # Counts how many distractions have occoured this session
 focusCounter = 0 # Counts how many consecutive frames face_look is 'Forward'
 distractCounter = 0 # Counts how many consecutive frames face_look is NOT 'Forward'
 
-camNum = 8 # CamNum set by making a virtual cam 'sudo modprobe v4l2loopback devices=1'
+camNum = 8 # CamNum set by making a virtual cam via v4l2loopback
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 ## User-Specific Measurements
