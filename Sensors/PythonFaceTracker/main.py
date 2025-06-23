@@ -19,6 +19,8 @@ lookThreshhold = 20 # How many consecutive frames before a status update is trig
 distractionCount = 0 # Counts how many distractions have occoured this session
 focusCounter = 0 # Counts how many consecutive frames face_look is 'Forward'
 distractCounter = 0 # Counts how many consecutive frames face_look is NOT 'Forward'
+
+camNum = 8 # CamNum set by making a virtual cam 'sudo modprobe v4l2loopback devices=1'
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 ## User-Specific Measurements
@@ -225,8 +227,7 @@ mp_face_mesh = mp.solutions.face_mesh.FaceMesh(
     min_tracking_confidence=MIN_TRACKING_CONFIDENCE,
 )
 
-cam_source = int(args.camSource)
-cap = cv.VideoCapture(cam_source) # This is it and how it works 
+cap = cv.VideoCapture(camNum) 
 
 #print("THIS IS MY SHITS  \n")
 #print(cap)

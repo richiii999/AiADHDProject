@@ -14,9 +14,12 @@ startTime = time.time()
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 5 # delay for each iteration of prompting
 
-### Servers # TODO currently you must start the servers manually, idk why these do not work
-# pexpect.spawn('DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve')
-# pexpect.spawn('ollama serve') # Ollama automatically runs on Ubuntu, no need to serve
+### SETUP: Must be done before running (on separate terminals / in background)
+# ollama serve # Ollama automatically runs on Ubuntu, no need to serve
+# DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
+# modprobe v4l2loopback video_nr=8,9 card_label="test1","test2" # Add video8/9 devices
+    # v4l2-ctl --list-devices # Verify devices have appeared correctly
+    # modprove -r v4l2loopback # Remove mod if it didnt work / want to change stuff
 
 # The AI model itself is accessed via API
 
@@ -30,6 +33,11 @@ cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py', # Default: main.py, alt: OutputTest.py (for both)
     'python ./Sensors/PythonGazeTracker/example.py' # Default: example.py 
 ]
+
+ffmpegLog = open('./Logs/ffmpegLog.txt', 'r+')
+ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -pix_fmt rgb24 /dev/video8 -f v4l2 -vcodec rawvideo -pix_fmt rgb24 /dev/video9 -loglevel quiet', shell=True)
+
+time.sleep(2) # Couple sec buffer for ffmpeg to start streaming to video8/9 
 
 # Sensor processes which record data to be passed to the AI
 sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))]

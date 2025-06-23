@@ -7,8 +7,6 @@ import cv2
 import time
 from gaze_tracking import GazeTracking
 
-gaze = GazeTracking()
-webcam = cv2.VideoCapture(0)
 
 # ADHD Zoned out detection vars
 frametime = 0.1 # How long between each frame (in sec)
@@ -18,6 +16,10 @@ lookThreshold = 6 # How many pixels do eyes have to move for it to count as movi
 zonedOutThreshhold = 20 # How many consecutive frames count as being 'zoned out' ?
 currLx, currLy = 0, 0 # eye position trackers
 currRx, currRy = 0, 0
+
+camNum = 9 # CamNum set by making a virtual cam 'sudo modprobe v4l2loopback devices=1'
+gaze = GazeTracking()
+webcam = cv2.VideoCapture(camNum)
 
 while True:
     # We get a new frame from the webcam
