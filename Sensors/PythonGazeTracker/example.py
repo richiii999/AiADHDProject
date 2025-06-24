@@ -56,7 +56,7 @@ while True:
         righty= int(righty[:-1])
 
 
-        # ADHD Zoned out detection
+        ### ADHD Zoned out detection
         time.sleep(frametime)
         # Increment count if eyes havent moved, else reset
         frameCounter += 1 # Increment frame (always) and distract (if eyes havent moved, else reset)
