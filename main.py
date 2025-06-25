@@ -24,6 +24,10 @@ iterDelay = 10 # delay for each iteration of prompting
     # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
 # install ffmpeg if you dont already have it
 
+# Quickly change if AI / cams run rather than commenting out
+AI = False
+CAM = True
+
 # The AI model itself is accessed via API
 try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C / crashes
     ### Sensors & Subprocesses
@@ -41,11 +45,12 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
         'python ./Sensors/PythonGazeTracker/example.py' # Default: example.py 
     ]
 
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet', shell=True)
-    time.sleep(2) # Couple sec buffer for ffmpeg to start streaming to video8/9 
+    if CAM:
+        ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet', shell=True)
+        time.sleep(2) # Couple sec buffer for ffmpeg to start streaming to video8/9 
 
-    # Sensor processes which record data to be passed to the AI
-    sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))]
+        # Sensor processes which record data to be passed to the AI
+        sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))]
 
     ### RAG
     KB = [ # Knowledge base, for RAG
@@ -60,12 +65,13 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
     # with open("./LLM/initPrompt.txt", 'r') as f: 
     #     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-    with open("./LLM/create_ADHD.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
+    if AI:
+        with open("./LLM/create_ADHD.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
 
-    # Learning material upload & KB creation
-    for path in KB:
-        file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-        API.add_file_to_knowledge(file_ID)
+        # Learning material upload & KB creation
+        for path in KB:
+            file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+            API.add_file_to_knowledge(file_ID)
 
     ### Main loop
     time.sleep(initDelay) # give servers & sensors time to start up
@@ -76,10 +82,10 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
             sensorData += f.readlines()[-1]
         print(sensorData)
 
-        # Prompt
-        response = API.chat_with_collection(sensorData,API.kb_id)
-        try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page when created, else 'model not found'
-        except: print(response)
+        if AI: # Prompt
+            response = API.chat_with_collection(sensorData,API.kb_id)
+            try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page when created, else 'model not found'
+            except: print(response)
 
         print('delayStart')
         time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
