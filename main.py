@@ -9,10 +9,15 @@ import cv2 # Camera
 import pexpect # Module which manages subprocess I/O (ollama & webui servers)
 import API # Contains API calls to webui
 
+def EndStudySession(summaryPrompt): # Writes the response to summaryPrompt into the StudyHistory.txt file
+    with open('./KB/StudyHistory.txt', 'a') as f: f.write(API.chat_with_model(summaryPrompt)['choices'][0]['message']['content'])
+
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 startTime = time.time()
 initDelay = 10 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 10 # delay for each iteration of prompting
+studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe ask user input on start?
+# TODO also the user should be able to end at any time, and we still want a summary ('study session ended early by user' or something)
 
 ### SETUP: Must be done before running (on separate terminals / in background)
 # Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
@@ -54,18 +59,18 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
 
     ### RAG
     KB = [ # Knowledge base, for RAG
+        './KB/StudyHistory.txt', # Summaries added by the AI after the end of study sessions.
         './KB/ADHD2.pdf', # ADHD Information 1, Some strats
         './KB/TeachingADHD.pdf', # ADHD Information 2, Good strats like quizzes and summaries
         './KB/OB_CH13.pptx' # Study Material 1
     ]
 
-    ### Initialization of LLM 
-    # TODO Reading system prompt from a file with newlines would be better than having to manually remove it and put it in the curl command
-    # sysPrompt = "" # Set system prompt
-    # with open("./LLM/initPrompt.txt", 'r') as f: 
-    #     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
+    if AI: ### Initialization of LLM 
+        # TODO Reading system prompt from a file with newlines would be better than having to manually remove it and put it in the curl command
+        # sysPrompt = "" # Set system prompt
+        # with open("./LLM/initPrompt.txt", 'r') as f: 
+        #     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-    if AI:
         with open("./LLM/create_ADHD.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
 
         # Learning material upload & KB creation
@@ -73,9 +78,8 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
             file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
             API.add_file_to_knowledge(file_ID)
 
-    ### Main loop
     time.sleep(initDelay) # give servers & sensors time to start up
-    while True:
+    while True #TODO time.time() - startTime < study session length: ### Main loop
         sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
         for f in logFiles: # Get most recent output per sensor 
             f.seek(0) # TODO eventually change to seeking from end of file instead of start
@@ -84,12 +88,14 @@ try: # Very dumb way of doing it, there has to be a better way to handle CTRL-C 
 
         if AI: # Prompt
             response = API.chat_with_collection(sensorData,API.kb_id)
-            try: print(response['choices'][0]['message']['content']) # BUG: Need to manuallr refresh webui page when created, else 'model not found'
+            try: print(response['choices'][0]['message']['content']) # BUG: Need to manually refresh webui page when created, else 'model not found'
             except: print(response)
 
         print('delayStart')
         time.sleep(iterDelay) # Delay AFTER response (So you can actually read it)
         print('delayEnd')
+
+    EndStudySession() # End study session: Summarize study session and append response to StudyHistory.txt
 
 except Exception as e: # Gracefully close subprocesses on close / crash
     print(e)

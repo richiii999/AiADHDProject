@@ -1,0 +1,8 @@
+Prior Study History:
+
+Throughout the study session, the student's focus was a mixed bag. Initially, they appeared to be focused (according to both the FaceTracker and GazeTracker) for the first 20 minutes, indicating a strong attention span.
+However, as time went on, their focus began to waver. Between 20-30 minutes, they became distracted according to the FaceTracker, while the GazeTracker suggested they remained somewhat focused. This inconsistency might indicate that the student was still engaged but struggling to maintain their concentration.
+After 30 minutes, both trackers agreed that the student was distracted, which is when I created a quiz to help them refocus and retain the information learned so far. The quiz seemed to have some positive effects, as the student's focus improved slightly for the next 10-15 minutes (FaceTracker: focused, GazeTracker: somewhat focused).
+Unfortunately, their distraction persisted beyond that point. By 50-60 minutes, both trackers indicated that the student was again distracted, which led me to suggest ending the study session and giving them a chance to recharge.
+Overall, while the student showed moments of focus throughout the session, they struggled to maintain consistent attention and engagement.
+
