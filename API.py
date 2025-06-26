@@ -6,13 +6,12 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "ADHD:latest" # Default: "llama3.2:latest"
+model = "llama3:8b" # Default: "llama3.2:latest"
 #base = "llama3.2:1b"
 
 ### Keys and links
-kb_id = "2be7bb87-e20c-4aeb-af6c-6196a07d6397" # 'asdf' KB on webui
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQwMGQyMzQ4LTI3ZTktNDZlMC04ZTIzLTQzM2FmYjhiM2U4NyJ9.LsSixAYAgji1cLDoQO0ZeaBWNAQtyeaxiJyIhgBZjJk'
-
+kb_id = "4a1f7b67-261b-4588-bae8-1ee784699b8a" # 'asdf' KB on webui
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ4NWJmMzUwLWI0YmQtNDNlMC04NTkxLTBhYTJlZDc0M2M5YyJ9.JSOQTr-v0FfcOiFrrZ3K7B21qP3DwzHtNHbzaFcYWZo'
 def chat_with_model(prompt, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
@@ -77,4 +76,14 @@ def chat_with_collection(prompt, collection_id, token=adminToken):
         'files': [{'type': 'collection', 'id': collection_id}]
     }
     response = requests.post(url, headers=headers, json=payload)
+    return response.json()
+
+def remove_file_from_knowledge(knowledge_id, file_id):
+    url = f'http://localhost:{localHostPort}/api/v1/knowledge/{knowledge_id}/file/remove'
+    headers = {
+        'Authorization': f'Bearer {adminToken}',
+        'Content-Type': 'application/json'
+    }
+    data = {'file_id': file_id}
+    response = requests.post(url, headers=headers, json=data)
     return response.json()

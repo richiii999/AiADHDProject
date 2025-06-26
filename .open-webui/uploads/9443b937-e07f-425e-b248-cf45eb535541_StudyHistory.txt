@@ -1,0 +1,9 @@
+Prior Study History:
+
+Throughout the 60-minute study session, the student's focus exhibited some fluctuations. Initially, between Time = 5 minutes and Time = 20 minutes, the user was focused, as indicated by both FaceTracker and GazeTracker.
+
+However, around Time = 20-30 minutes, the user became distracted, with FaceTracker detecting distraction and GazeTracker still indicating focus. This period of distraction persisted until around Time = 40 minutes, whereupon the user took a break (which I suggested).
+
+After the break, the user regained their focus, as seen from Time = 50 minutes to the end of the session at Time = 60 minutes. Both FaceTracker and GazeTracker consistently reported the user was focused during this latter portion of the study session.
+
+In summary, the student's focus exhibited a mix of focused periods (initially and towards the end) with some distraction in between.
