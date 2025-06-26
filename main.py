@@ -41,7 +41,7 @@ studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe
 # BUG: cv2.error: OpenCV(4.11.0) /io/opencv/modules/imgproc/src/bilateral_filter.dispatch.cpp:409: error: (-215:Assertion failed) !_src.empty() in function 'bilateralFilter'
 # ^ Happens to GazeTracker when 2 people are on the screen at once I think, very strange
 
-AI = False # Quickly change if AI / cams run rather than commenting out
+AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
 HISTORY_ID = ""
 

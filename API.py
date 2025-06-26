@@ -6,12 +6,12 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "llama3:8b" # Default: "llama3.2:latest"
-#base = "llama3.2:1b"
+model = "ADHD:latest" # Default: "llama3.2:latest"
+#base = "llama3.2:8b"
 
 ### Keys and links
-kb_id = "4a1f7b67-261b-4588-bae8-1ee784699b8a" # 'asdf' KB on webui
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ4NWJmMzUwLWI0YmQtNDNlMC04NTkxLTBhYTJlZDc0M2M5YyJ9.JSOQTr-v0FfcOiFrrZ3K7B21qP3DwzHtNHbzaFcYWZo'
+kb_id = "b0d9a0aa-0878-48e8-8919-be889408f03f" # 'asdf' KB on webui
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhlMjIzMjdmLWUzYTEtNGQzMy1hYmQzLTU5ZjRmYzVjNmMyNiJ9.9qXMRyTbfKBdKI9-H6KvBk3DL9t9KHwDshuT_wrXSfU'
 def chat_with_model(prompt, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
