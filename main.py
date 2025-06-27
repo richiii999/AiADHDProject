@@ -5,11 +5,10 @@ import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 import time
 
-import cv2 # Camera
 import API # Contains API calls to webui
 
 def EndStudySession(summaryPrompt, history_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
-    print('\nEnding study session.\n')
+    print('\nEnding study session...\n')
     with open('./KB/StudyHistory.txt', 'a') as f: f.write('\n' + API.chat_with_model(summaryPrompt)['choices'][0]['message']['content']) # Summary prompt and append result to the history file
     API.remove_file_from_knowledge(API.kb_id, history_id) # Delete the old file from the knowledge base
     # On next session, the new history is uploaded
@@ -22,10 +21,7 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 startTime = time.time()
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
-iterDelay = 3 # delay for each iteration of prompting\
-
-studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe ask user input on start?
-# TODO also the user should be able to end at any time, and we still want a summary ('study session ended early by user' or something)
+iterDelay = 20 # delay for each iteration of prompting
 
 ### SETUP: Must be done before running (on separate terminals / in background)
 # Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
@@ -51,7 +47,7 @@ logFiles = [ # Log files, sensor output is periodically read from here and given
 
 for f in logFiles: 
     f.truncate(0) # Empty old logs
-    f.write('The User seems focused.\n') # Placeholder first log entry
+    f.write('\n') # Placeholder first log entry
 
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
@@ -79,7 +75,7 @@ KB = [ ### RAG Knowledge base
 ]
 
 if AI: ### Initialization of LLM 
-    # Set system prompt from file
+    # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
     with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
 
     # Learning material upload & KB creation
@@ -98,8 +94,8 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     print(sensorData)
 
     if AI: # Prompt
-        response = API.chat_with_collection(sensorData,API.kb_id)
-        try: print(response['choices'][0]['message']['content']) # BUG: Need to manually refresh webui page when newly created, else 'model not found'
+        response = API.chat_with_collection(sensorData, API.kb_id)
+        try: print(response['choices'][0]['message']['content']) 
         except: print(response)
 
     time.sleep(iterDelay)
@@ -107,7 +103,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 if AI: ### End of study: Summarize study session and append response to StudyHistory.txt
     with open('./LLM/SummaryPrompt.txt') as f: EndStudySession(ReadFileAsLine(f), HISTORY_ID)
 
-for s in sensors[1:]: s.terminate() # Close files and terminate procs
+for s in sensors[1:]: s.terminate()
 for f in logFiles: f.close() 
 ffmpeg.terminate()
 
