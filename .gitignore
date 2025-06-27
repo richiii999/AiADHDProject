@@ -2,3 +2,4 @@ __pycache__/
 Sensors/PythonGazeTracker/gaze_tracking/trained_models/
 Logs/
 .open-webui/vector_db
+.open-webui/uploads
