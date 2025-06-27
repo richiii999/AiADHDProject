@@ -32,7 +32,7 @@ studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe
 # ollama serve # Ollama automatically runs on Ubuntu, no need to serve
 # DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
 # DATA_DIR=./.open-webui open-webui@latest serve # Non-UV version of open-webui
-# sudo modprobe v4l2loopback video_nr=8,9 card_label="test1","test2" # Add video8/9 devices
+# sudo modprobe v4l2loopback video_nr=8,9,10 # Add video8/9 devices
     # v4l2-ctl --list-devices # Verify devices have appeared correctly
     # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
     # install ffmpeg if you dont already have it
@@ -60,7 +60,11 @@ cmds = [ # Commands to run each sensor process
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet', shell=True)
+    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 \
+    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 \
+    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
+    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
+    -loglevel quiet', shell=True)
     time.sleep(2) # Couple sec buffer for ffmpeg to start streaming to video8/9 
 
 # Sensor processes which record data to be passed to the AI
