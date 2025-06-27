@@ -24,3 +24,23 @@ The student has been studying Organizational Behavior for a study session of 60 
 - The final 20 minutes of the study session were spent re-reading notes and making flashcards.
 
 END SUMMARY
+START SUMMARY
+
+The study session started at 2:00 PM and lasted for approximately 1 hour. During this time, the student focused primarily on Organizational Behavior topics, including leadership and organizational structure. The student appeared engaged and attentive throughout the session.
+
+There were no significant distractions during the study session. However, it is worth noting that there was a brief moment around 4:00 PM when the student's phone rang, but they ignored it without responding to the call or taking any action.
+
+The student has not taken a quiz yet as per your request.
+
+END SUMMARY
+START SUMMARY
+
+The study session started at 10:00 AM and lasted for 3 hours. The focus of the student shifted throughout the time, with them becoming increasingly engaged in reading Organizational Behavior chapters at various points.
+
+During the initial 30 minutes to an hour, the student showed little interest in the material, spending most of their time browsing social media. However, as the study session progressed, their attention became more concentrated on the topics covered.
+
+The student's quiz score was 80%, with the top question receiving a perfect score (100%). The lowest-scoring questions were related to the topic of power dynamics and organizational culture.
+
+As for the effectiveness of suggested actions to reduce distraction, they found that creating a conducive study environment by minimizing digital distractions, such as turning off notifications and finding a quiet space, greatly improved their ability to focus. They also reported that taking regular breaks helped them stay on track and avoid burnout.
+
+END SUMMARY

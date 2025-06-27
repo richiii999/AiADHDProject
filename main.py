@@ -2,11 +2,10 @@
 # Manages the sensors via subprocesses and prompts the LLM via the webui API
 
 import sys
-import subprocess
+import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 import time
 
 import cv2 # Camera
-import pexpect # Module which manages subprocess I/O (ollama & webui servers)
 import API # Contains API calls to webui
 
 def EndStudySession(summaryPrompt, history_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
@@ -43,7 +42,7 @@ studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe
 
 AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
-HISTORY_ID = ""
+HISTORY_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
@@ -81,7 +80,7 @@ if AI: ### Initialization of LLM
     # with open("./LLM/initPrompt.txt", 'r') as f: 
     #     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
 
-    with open("./LLM/create_ADHD.txt") as f: pexpect.run(f.readline()) # Dumb way, but due to string formatting issues this is a workaround
+    with open("./LLM/create_ADHD.txt") as f: subprocess.run(f.readline(), shell=True) # Dumb way, but due to string formatting issues this is a workaround
 
     # Learning material upload & KB creation
     for path in KB:
@@ -105,8 +104,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
     time.sleep(iterDelay)
 
-### End of study: Summarize study session and append response to StudyHistory.txt
-if AI: 
+if AI: ### End of study: Summarize study session and append response to StudyHistory.txt
     with open('./LLM/SummaryPrompt.txt') as f: EndStudySession(ReadFileAsStr(f), HISTORY_ID)
 
 for s in sensors[1:]: s.terminate() # Close files and terminate procs
