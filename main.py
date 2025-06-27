@@ -7,6 +7,8 @@ import time
 
 import API # Contains API calls to webui
 
+# TODO Knowledge file goes first, history file is added in endstudy func then removedm, then knowledge remioved knowledge is a verbose response based on summary
+
 def EndStudySession(summaryPrompt, history_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
     with open('./KB/StudyHistory.txt', 'a') as f: f.write('\n' + API.chat_with_model(summaryPrompt)['choices'][0]['message']['content']) # Summary prompt and append result to the history file
