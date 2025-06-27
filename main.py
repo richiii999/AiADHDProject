@@ -14,9 +14,9 @@ def EndStudySession(summaryPrompt, history_id): # Writes the response to summary
     API.remove_file_from_knowledge(API.kb_id, history_id) # Delete the old file from the knowledge base
     # On next session, the new history is uploaded
 
-def ReadFileAsStr(f) -> str: # Read a file as a str (multi-line)
+def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     s = ''
-    for line in f.readlines(): s += line
+    for line in f.readlines(): s += line.replace('\n',' ')
     return s
 
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
@@ -29,13 +29,11 @@ studyLen = 60 * 123 # TODO: How long (in min) should the study session be? Maybe
 
 ### SETUP: Must be done before running (on separate terminals / in background)
 # Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
-# ollama serve # Ollama automatically runs on Ubuntu, no need to serve
 # DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
 # DATA_DIR=./.open-webui open-webui@latest serve # Non-UV version of open-webui
 # sudo modprobe v4l2loopback video_nr=8,9,10 # Add video8/9 devices
     # v4l2-ctl --list-devices # Verify devices have appeared correctly
     # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
-    # install ffmpeg if you dont already have it
 
 # BUG: cv2.error: OpenCV(4.11.0) /io/opencv/modules/imgproc/src/bilateral_filter.dispatch.cpp:409: error: (-215:Assertion failed) !_src.empty() in function 'bilateralFilter'
 # ^ Happens to GazeTracker when 2 people are on the screen at once I think, very strange
@@ -47,7 +45,8 @@ HISTORY_ID = "" # Used to store the file id of the studyhistory.txt file on webu
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
     open('./Logs/faceTracker.txt', 'r+'),
-    open('./Logs/gazeTracker.txt', 'r+')
+    open('./Logs/gazeTracker.txt', 'r+'),
+    open('./Logs/VLM.txt', 'r+')
 ]
 
 for f in logFiles: 
@@ -55,36 +54,33 @@ for f in logFiles:
     f.write('The User seems focused.\n') # Placeholder first log entry
 
 cmds = [ # Commands to run each sensor process
-    'python ./Sensors/PythonFaceTracker/main.py', # Default: main.py, alt: OutputTest.py (for both)
-    'python ./Sensors/PythonGazeTracker/example.py' # Default: example.py 
+    'python ./Sensors/PythonFaceTracker/main.py',
+    'python ./Sensors/PythonGazeTracker/example.py'
+    #'python ./Sensors/moondream/live_testcam.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
     ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 \
     -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 \
     -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
-    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
+    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video10 \
     -loglevel quiet', shell=True)
-    time.sleep(2) # Couple sec buffer for ffmpeg to start streaming to video8/9 
+    time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
 sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
 
 
 KB = [ ### RAG Knowledge base
-    './KB/StudyHistory.txt', # Summaries added by the AI after the end of study sessions. #This MUST BE FIRST
+    './KB/StudyHistory.txt', # Summaries added by the AI after the end of study sessions. # MUST BE FIRST
     './KB/ADHD2.pdf', # ADHD Information 1, Some strats
     './KB/TeachingADHD.pdf', # ADHD Information 2, Good strats like quizzes and summaries
     './KB/OB_CH13.pptx' # Study Material 1
 ]
 
 if AI: ### Initialization of LLM 
-    # TODO Reading system prompt from a file with newlines would be better than having to manually remove it and put it in the curl command
-    # sysPrompt = "" # Set system prompt
-    # with open("./LLM/initPrompt.txt", 'r') as f: 
-    #     for line in f.readlines(): sysPrompt += line.replace('\n',' ')
-
-    with open("./LLM/create_ADHD.txt") as f: subprocess.run(f.readline(), shell=True) # Dumb way, but due to string formatting issues this is a workaround
+    # Set system prompt from file
+    with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
 
     # Learning material upload & KB creation
     for path in KB:
@@ -97,7 +93,7 @@ if AI: ### Initialization of LLM
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
     for f in logFiles: # Get most recent output per sensor 
-        f.seek(0) # TODO eventually change to seeking from end of file instead of start
+        f.seek(0)
         sensorData += f.readlines()[-1]
     print(sensorData)
 
@@ -109,7 +105,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     time.sleep(iterDelay)
 
 if AI: ### End of study: Summarize study session and append response to StudyHistory.txt
-    with open('./LLM/SummaryPrompt.txt') as f: EndStudySession(ReadFileAsStr(f), HISTORY_ID)
+    with open('./LLM/SummaryPrompt.txt') as f: EndStudySession(ReadFileAsLine(f), HISTORY_ID)
 
 for s in sensors[1:]: s.terminate() # Close files and terminate procs
 for f in logFiles: f.close() 
