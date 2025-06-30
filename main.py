@@ -28,6 +28,9 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     for line in f.readlines(): s += line.replace('\n',' ')
     return s
 
+def GettingScreenshots():
+
+
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 startTime = time.time()
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
@@ -84,6 +87,7 @@ KB = [ ### RAG Knowledge base
     './KB/OB_CH13.pptx' # Study Material 1
 ]
 
+#IT's right here for creating the system prompt
 if AI: ### Initialization of LLM 
     # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
     with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
@@ -96,6 +100,13 @@ if AI: ### Initialization of LLM
 
     time.sleep(initDelay) # give servers & sensors time to start up
 
+
+
+# This below specifies the LOCATION of the screenshot and name of the file
+# gnome-screenshot -w -f ./AiADHDProject/KB/img.png
+
+
+
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
     for f in logFiles: # Get most recent output per sensor 
@@ -104,6 +115,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     print(sensorData)
 
     if AI: # Prompt
+        #remove old screenshot and replace the img.png
         response = API.chat_with_collection(sensorData, API.kb_id)
         try: print(response['choices'][0]['message']['content']) 
         except: print(response)
