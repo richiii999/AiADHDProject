@@ -83,13 +83,11 @@ if CAM: # Setup virtual cam devices and split original cam input to them
     ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 \
     -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 \
     -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
-    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video10 \
     -loglevel quiet', shell=True)
     time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
 sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
-
 
 KB = [ ### RAG Knowledge base
     './KB/Knowledge.txt', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
@@ -98,7 +96,6 @@ KB = [ ### RAG Knowledge base
     './KB/OB_CH13.pptx' # Study Material 1
 ]
 
-#IT's right here for creating the system prompt
 if AI: ### Initialization of LLM 
     # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
     with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
@@ -113,7 +110,6 @@ if AI: ### Initialization of LLM
         if KNOWLEDGE_ID == "": KNOWLEDGE_ID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
     time.sleep(initDelay) # give servers & sensors time to start up
-
 
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
