@@ -7,10 +7,12 @@ import time
 
 import API # Contains API calls to webui
 
-# TODO Knowledge file goes first, history file is added in endstudy func then removedm, then knowledge remioved knowledge is a verbose response based on summary
+# TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
 
-def EndStudySession(knowledge_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
+def EndStudySession(knowledge_id, ssid): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
+
+    API.remove_file_from_knowledge(ssid) # Remove screenshot
 
     with open('./KB/StudyHistory.txt', 'a') as f1: 
         with open('./LLM/SummaryPrompt.txt', 'r') as p1: f1.write('\n' + API.chat_with_model(ReadFileAsLine(p1))['choices'][0]['message']['content']) # Summary append to history file
@@ -21,16 +23,21 @@ def EndStudySession(knowledge_id): # Writes the response to summaryPrompt into t
             with open('./LLM/KnowledgePrompt.txt', 'r') as p2: f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
 
     # TODO Delete history and knowledge file # There doesnt seem to be a way to delete files, so the .open-webui/uploads folder will keep growing 
-    API.remove_file_from_knowledge(API.kb_id, knowledge_id) # Remove current Knowledge from KB (new one is uploaded on next start)
+    API.remove_file_from_knowledge(knowledge_id) # Remove current Knowledge from KB (new one is uploaded on next start)
 
 def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     s = ''
     for line in f.readlines(): s += line.replace('\n',' ')
     return s
 
-def AIScreenshot():
-    subprocess.run(f'gnome-screenshot -w -f ./AiADHDProject/KB/img.png', shell=True) # Take a screenshot
-    API.remove_file_from_knowledge() # remove old screenshot and replace the img.png
+def AIScreenshot(ssid) -> str: # TODO special case first ss?
+    subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss
+    if ssid != "": API.remove_file_from_knowledge(ssid) # remove old ss from kb (if it exists)
+
+    ssid = API.upload_file('./KB/ss.png') # Replace old ss with new ss
+    API.add_file_to_knowledge(ssid)
+
+    return ssid
 
 
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
@@ -52,7 +59,7 @@ iterDelay = 10 # delay for each iteration of prompting
 AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
 
-HISTORY_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
+KNOWLEDGE_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
 SS_ID = "" # Stores the file_id of the screenshot
 
 ### Sensors & Subprocesses
@@ -69,7 +76,7 @@ for f in logFiles:
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
     'python ./Sensors/PythonGazeTracker/example.py'
-    'python ./Sensors/moondream/live_testcam.py'
+    # 'python ./Sensors/moondream/live_testcam.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
@@ -98,17 +105,14 @@ if AI: ### Initialization of LLM
 
     # Learning material upload & KB creation
     for path in KB:
-        file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        file_ID = API.upload_file(path) 
+        print(file_ID)
+        file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        
         API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error ^^, reset API keys
         if KNOWLEDGE_ID == "": KNOWLEDGE_ID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
     time.sleep(initDelay) # give servers & sensors time to start up
-
-
-
-# This below specifies the LOCATION of the screenshot and name of the file
-# gnome-screenshot -w -f ./AiADHDProject/KB/img.png
-
 
 
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
@@ -119,6 +123,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     print(sensorData)
 
     if AI:
+        SS_ID = AIScreenshot(SS_ID) # Take a ss and replace old one with new one in open-webui
 
         # Prompt
         response = API.chat_with_collection(sensorData, API.kb_id)
@@ -128,7 +133,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     time.sleep(iterDelay)
 
 if AI: ### End of study: Summarize study session and append response to StudyHistory.txt, then use that to create new knowledge
-    EndStudySession(KNOWLEDGE_ID)
+    EndStudySession(KNOWLEDGE_ID, SS_ID)
 
 for s in sensors[1:]: s.terminate()
 for f in logFiles: f.close() 

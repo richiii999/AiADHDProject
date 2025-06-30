@@ -8,3 +8,20 @@ START_SUMMARY
 - Quiz score: 85%
 
 END_SUMMARY
+START SUMMARY
+
+The study session started at 9:00 AM and lasted for 3 hours.
+
+During this study session, the student's focus was primarily on Organizational Behavior. However, they experienced several distractions throughout the session, including:
+
+* Checking their phone multiple times (occasionally)
+* Looking around the room while studying
+* Talking to a friend in the next room
+
+Despite these distractions, the student managed to maintain some level of concentration and completed most of the required reading.
+
+Quiz results: No quiz was administered during this study session. The student did attempt to complete a short quiz at the end of their first hour of studying, but it was cancelled due to lack of focus.
+
+The effectiveness of suggested actions to reduce distraction is: partially effective. While the student made efforts to minimize distractions, they still had trouble maintaining focus for extended periods and were occasionally sidetracked by external factors.
+
+END SUMMARY
