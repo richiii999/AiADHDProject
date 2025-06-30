@@ -19,11 +19,8 @@ model = AutoModelForCausalLM.from_pretrained(
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
+prompt = "The user is viewing a document, what are the first two sentences on this document? If there is no text, say 'No text availible'" # If there does not appear to be a slide in the image then say 'The user seems distracted.'"
 delay = 5
-prompt = "The user should be viewing a document, what page or slide are they on? \
-Respond as 'The user seems to be on page X.' where X is the page or slide number. \
-If there does not appear to be a document in the image, respond as 'The user seems distracted.'"
-
 while True: 
     print("VLM:", model.answer_question(Image.open('./KB/ss.png'), prompt))
-    time.sleep(5) # Delay before next prompt
+    time.sleep(5)
