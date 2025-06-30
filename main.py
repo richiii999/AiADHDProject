@@ -9,11 +9,19 @@ import API # Contains API calls to webui
 
 # TODO Knowledge file goes first, history file is added in endstudy func then removedm, then knowledge remioved knowledge is a verbose response based on summary
 
-def EndStudySession(summaryPrompt, history_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
+def EndStudySession(knowledge_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
-    with open('./KB/StudyHistory.txt', 'a') as f: f.write('\n' + API.chat_with_model(summaryPrompt)['choices'][0]['message']['content']) # Summary prompt and append result to the history file
-    API.remove_file_from_knowledge(API.kb_id, history_id) # Delete the old file from the knowledge base
-    # On next session, the new history is uploaded
+
+    with open('./KB/StudyHistory.txt', 'a') as f1: 
+        with open('./LLM/SummaryPrompt.txt', 'r') as p1: f1.write('\n' + API.chat_with_model(ReadFileAsLine(p1))['choices'][0]['message']['content']) # Summary append to history file
+        historyID = API.upload_file('./KB/StudyHistory.txt') # Upload history
+        
+        with open('./KB/Knowledge.txt', 'r+') as f2: # Update the knowledge based on history + current session
+            f2.truncate(0)
+            with open('./LLM/KnowledgePrompt.txt', 'r') as p2: f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
+
+    # TODO Delete history and knowledge file # There doesnt seem to be a way to delete files, so the .open-webui/uploads folder will keep growing 
+    API.remove_file_from_knowledge(API.kb_id, knowledge_id) # Remove current Knowledge from KB (new one is uploaded on next start)
 
 def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     s = ''
@@ -23,7 +31,7 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 startTime = time.time()
 initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
-iterDelay = 20 # delay for each iteration of prompting
+iterDelay = 10 # delay for each iteration of prompting
 
 ### SETUP: Must be done before running (on separate terminals / in background)
 # Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
@@ -38,7 +46,7 @@ iterDelay = 20 # delay for each iteration of prompting
 
 AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
-HISTORY_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
+KNOWLEDGE_ID = "" # Used to store the file id of the Knowledge.txt file on webui, so it can be updated without duplication later
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
@@ -54,7 +62,7 @@ for f in logFiles:
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
     'python ./Sensors/PythonGazeTracker/example.py'
-    #'python ./Sensors/moondream/live_testcam.py'
+    'python ./Sensors/moondream/live_testcam.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
@@ -70,7 +78,7 @@ sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in ra
 
 
 KB = [ ### RAG Knowledge base
-    './KB/StudyHistory.txt', # Summaries added by the AI after the end of study sessions. # MUST BE FIRST
+    './KB/Knowledge.txt', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
     './KB/ADHD2.pdf', # ADHD Information 1, Some strats
     './KB/TeachingADHD.pdf', # ADHD Information 2, Good strats like quizzes and summaries
     './KB/OB_CH13.pptx' # Study Material 1
@@ -83,8 +91,8 @@ if AI: ### Initialization of LLM
     # Learning material upload & KB creation
     for path in KB:
         file_ID = API.upload_file(path)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-        API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error here, reset API keys
-        if HISTORY_ID == "": HISTORY_ID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
+        API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error ^^, reset API keys
+        if KNOWLEDGE_ID == "": KNOWLEDGE_ID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
     time.sleep(initDelay) # give servers & sensors time to start up
 
@@ -102,8 +110,8 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
     time.sleep(iterDelay)
 
-if AI: ### End of study: Summarize study session and append response to StudyHistory.txt
-    with open('./LLM/SummaryPrompt.txt') as f: EndStudySession(ReadFileAsLine(f), HISTORY_ID)
+if AI: ### End of study: Summarize study session and append response to StudyHistory.txt, then use that to create new knowledge
+    EndStudySession(KNOWLEDGE_ID)
 
 for s in sensors[1:]: s.terminate()
 for f in logFiles: f.close() 

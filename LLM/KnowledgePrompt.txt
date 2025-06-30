@@ -1,0 +1,1 @@
+Given is a history of study sessions by the student, analyze this study session history and learn lessons from it, such as what actions are more or less effective at reducing distractions.
