@@ -9,10 +9,8 @@ import API # Contains API calls to webui
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
 
-def EndStudySession(knowledge_id, ssid): # Writes the response to summaryPrompt into the StudyHistory.txt file
+def EndStudySession(knowledge_id): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
-
-    API.remove_file_from_knowledge(ssid) # Remove screenshot
 
     with open('./KB/StudyHistory.txt', 'a') as f1: 
         with open('./LLM/SummaryPrompt.txt', 'r') as p1: f1.write('\n' + API.chat_with_model(ReadFileAsLine(p1))['choices'][0]['message']['content']) # Summary append to history file
@@ -30,19 +28,9 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     for line in f.readlines(): s += line.replace('\n',' ')
     return s
 
-def AIScreenshot(ssid) -> str: # TODO special case first ss?
-    subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss
-    if ssid != "": API.remove_file_from_knowledge(ssid) # remove old ss from kb (if it exists)
-
-    ssid = API.upload_file('./KB/ss.png') # Replace old ss with new ss
-    API.add_file_to_knowledge(ssid)
-
-    return ssid
-
-
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
 startTime = time.time()
-initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
+initDelay = 8 # Initial delay after starting LLM to wait for it to be ready for input
 iterDelay = 10 # delay for each iteration of prompting
 
 ### SETUP: Must be done before running (on separate terminals / in background)
@@ -60,7 +48,6 @@ AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
 
 KNOWLEDGE_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
-SS_ID = "" # Stores the file_id of the screenshot
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
@@ -75,8 +62,8 @@ for f in logFiles:
 
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
-    'python ./Sensors/PythonGazeTracker/example.py'
-    # 'python ./Sensors/moondream/live_testcam.py'
+    'python ./Sensors/PythonGazeTracker/example.py',
+    'python ./Sensors/moondream/main.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
@@ -119,7 +106,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     print(sensorData)
 
     if AI:
-        SS_ID = AIScreenshot(SS_ID) # Take a ss and replace old one with new one in open-webui
+        subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss, moondream handles this file by itself
 
         # Prompt
         response = API.chat_with_collection(sensorData, API.kb_id)
@@ -129,7 +116,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     time.sleep(iterDelay)
 
 if AI: ### End of study: Summarize study session and append response to StudyHistory.txt, then use that to create new knowledge
-    EndStudySession(KNOWLEDGE_ID, SS_ID)
+    EndStudySession(KNOWLEDGE_ID)
 
 for s in sensors[1:]: s.terminate()
 for f in logFiles: f.close() 

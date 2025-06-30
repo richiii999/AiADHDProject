@@ -7,7 +7,7 @@ import requests
 ### Open-WebUI Settings
 localHostPort = "8080"
 model = "ADHD:latest" 
-base = "llama3.2:1b" # Default: "llama3.2:latest"
+base = "llama3:8b" # Default: "llama3.2:latest"
 
 ### Keys and links
 kb_id = "73ae866e-e7a9-4057-b9c6-abadf57b685b" 
