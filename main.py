@@ -28,7 +28,9 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     for line in f.readlines(): s += line.replace('\n',' ')
     return s
 
-def GettingScreenshots():
+def AIScreenshot():
+    subprocess.run(f'gnome-screenshot -w -f ./AiADHDProject/KB/img.png', shell=True) # Take a screenshot
+    API.remove_file_from_knowledge() # remove old screenshot and replace the img.png
 
 
 # Increase delay for slower computers. Eventually iterDelay is measured in minutes so it's okay
@@ -49,7 +51,9 @@ iterDelay = 10 # delay for each iteration of prompting
 
 AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
-KNOWLEDGE_ID = "" # Used to store the file id of the Knowledge.txt file on webui, so it can be updated without duplication later
+
+HISTORY_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
+SS_ID = "" # Stores the file_id of the screenshot
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
@@ -114,8 +118,9 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
         sensorData += f.readlines()[-1]
     print(sensorData)
 
-    if AI: # Prompt
-        #remove old screenshot and replace the img.png
+    if AI:
+
+        # Prompt
         response = API.chat_with_collection(sensorData, API.kb_id)
         try: print(response['choices'][0]['message']['content']) 
         except: print(response)
