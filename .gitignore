@@ -1,7 +1,9 @@
 __pycache__/
-Sensors/PythonGazeTracker/gaze_tracking/trained_models/
-.open-webui/vector_db
-.open-webui/uploads
-.open-webui/cache
-.vscode
+.open-webui/
+.webui_secret_key
+.vscode/
+.venv/
+uv.lock
+
 Sensors/Moondream/moondream05b.mf
+Sensors/PythonGazeTracker/gaze_tracking/trained_models/shape_predictor_68_face_landmarks.dat
