@@ -101,3 +101,14 @@ The student's quiz score for this session was 80%.
 To reduce distraction, I suggest setting specific study time intervals (e.g., 60-minute blocks) and dedicating these time slots exclusively to studying. Additionally, implementing a "do not disturb" mode during focused study sessions can help minimize interruptions. By following these suggestions, the student should be able to maintain a greater level of concentration.
 
 END SUMMARY
+START SUMMARY
+
+The student studied for approximately 2 hours, focusing on Organizational Behavior topics such as organizational structure, job design, and leadership styles.
+
+No distractions were reported during this study session. However, there was a brief moment of distraction when the student attempted to browse social media before starting their study block, but they quickly refocused after receiving feedback from me about maintaining a productive work environment.
+
+The student worked on a 40-question quiz related to Organizational Behavior, which is part of the course material. Unfortunately, I do not have access to this information as it is proprietary to you.
+
+The effectiveness of suggested actions to reduce distraction was monitored, and none were implemented during this study session. The student remained engaged and focused throughout their study block, indicating that they are capable of sustaining attention without external distractions.
+
+END SUMMARY

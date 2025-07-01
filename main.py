@@ -44,7 +44,7 @@ iterDelay = 10 # delay for each iteration of prompting
 # BUG: cv2.error: OpenCV(4.11.0) /io/opencv/modules/imgproc/src/bilateral_filter.dispatch.cpp:409: error: (-215:Assertion failed) !_src.empty() in function 'bilateralFilter'
 # ^ Happens to GazeTracker when 2 people are on the screen at once I think, very strange
 
-AI = False # Quickly change if AI / cams run rather than commenting out
+AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
 
 KNOWLEDGE_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -52,7 +52,6 @@ KNOWLEDGE_ID = "" # Used to store the file id of the studyhistory.txt file on we
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
     open('./Logs/faceTracker.txt', 'r+'),
-    open('./Logs/gazeTracker.txt', 'r+'),
     open('./Logs/VLM.txt', 'r+')
 ]
 
@@ -62,15 +61,11 @@ for f in logFiles:
 
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
-    'python ./Sensors/PythonGazeTracker/example.py',
     'python ./Sensors/Moondream/main.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 \
-    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 \
-    -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 \
-    -loglevel quiet', shell=True)
+    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -loglevel quiet', shell=True)
     time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
