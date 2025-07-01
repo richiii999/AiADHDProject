@@ -7,7 +7,7 @@ import requests
 ### Open-WebUI Settings
 localHostPort = "8080"
 model = "ADHD:latest" 
-base = "llama3.2:1b" # Default: "llama3.2:latest"
+base = "llama3:8b" # Default: "llama3.2:latest"
 
 ### Keys and links
 kb_id = "73ae866e-e7a9-4057-b9c6-abadf57b685b" 
@@ -66,7 +66,7 @@ def chat_with_file(prompt, file_id, token=adminToken):
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
-def chat_with_collection(prompt, collection_id, token=adminToken):
+def chat_with_collection(prompt, collection_id=kb_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',

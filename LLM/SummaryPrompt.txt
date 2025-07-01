@@ -1,9 +1,7 @@
-Summarize the focus of the student over the course of this study session. 
+Based on the sensor data, summarize the focus of the student over the course of this study session.
 
-Make sure to include the following details: Length of study session, focus and distraction of the student, topic of study, quiz results (if available), and effectiveness of suggested actions to reduce distraction. 
+Make sure to include the following details: Length of study session, topic of study, and what actions were suggested to reduce distraction.
 
 Begin the summary with 'START SUMMARY' and end it with 'END SUMMARY' 
 
 Do not make up reason why the student was distracted, only if they were or were not distracted.
-
-If you include quiz results, only include quiz score, not the questions.
