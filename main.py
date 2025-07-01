@@ -44,7 +44,7 @@ iterDelay = 10 # delay for each iteration of prompting
 # BUG: cv2.error: OpenCV(4.11.0) /io/opencv/modules/imgproc/src/bilateral_filter.dispatch.cpp:409: error: (-215:Assertion failed) !_src.empty() in function 'bilateralFilter'
 # ^ Happens to GazeTracker when 2 people are on the screen at once I think, very strange
 
-AI = True # Quickly change if AI / cams run rather than commenting out
+AI = False # Quickly change if AI / cams run rather than commenting out
 CAM = True
 
 KNOWLEDGE_ID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -63,7 +63,7 @@ for f in logFiles:
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
     'python ./Sensors/PythonGazeTracker/example.py',
-    'python ./Sensors/moondream/main.py'
+    'python ./Sensors/Moondream/main.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
@@ -90,7 +90,7 @@ if AI: ### Initialization of LLM
     # Learning material upload & KB creation
     for path in KB:
         file_ID = API.upload_file(path) 
-        print(file_ID)
+        #print(file_ID)
         file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         
         API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error ^^, reset API keys
@@ -106,7 +106,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     print(sensorData)
 
     if AI:
-        subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss, moondream handles this file by itself
+        # subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss, moondream handles this file by itself
 
         # Prompt
         response = API.chat_with_collection(sensorData, API.kb_id)
