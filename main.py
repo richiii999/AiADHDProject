@@ -19,7 +19,7 @@ import time
 import API # ./API.py: Contains API calls to webui
 
 AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
-startTime, initDelay, iterDelay = time.time(), 5, 4 # Timing delays
+startTime, initDelay, iterDelay = time.time(), 5, 20 # Timing delays
 
 def PromptAI(prompt):
     response = API.chat_with_collection(prompt)
@@ -91,7 +91,6 @@ if AI: ### Initialization of LLM
         API.add_file_to_knowledge(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
-
 time.sleep(initDelay) # give servers & sensors time to start up
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
@@ -100,7 +99,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
         sensorData += f.readlines()[-1]
     print(sensorData)
 
-    subprocess.run(f'rm ./KB/ss.png; scrot ./KB/ss.png', shell=True) # Take a ss for moondream
+    subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: PromptAI(sensorData)
 

@@ -1,15 +1,11 @@
-VLM: Nothing detected
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
 The user seems focused
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
-VLM: Nothing detected
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020
+VLM: The user appears to be on the page which contains: Table 13-1 Fortune's 15 Most Powerful Women in Business in 2020

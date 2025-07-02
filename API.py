@@ -10,8 +10,8 @@ model = "ADHD:latest"
 base = "llama3:8b" # Default: "llama3.2:latest"
 
 ### Keys and links
-kb_id = "63d72707-8d99-4b09-a331-2c1ce85953ac" 
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
+kb_id = "73ae866e-e7a9-4057-b9c6-abadf57b685b" 
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1MTJhMjRjLTQ5YmMtNDFkYS1hMDQ2LTQ1MzFjNGQ1MGY1OSJ9.hS94_5e9x9G8sVmZbqmS2WFX7iB09ylCHWkbOI5bQu4'
 
 ### API
 def chat_with_model(prompt, token=adminToken):
