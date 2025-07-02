@@ -1,5 +1,5 @@
-import cv2_NEW as cv
-import numpy_NEW as np
+import cv2 as cv
+import numpy as np
 import mediapipe as mp
 import math
 import socket

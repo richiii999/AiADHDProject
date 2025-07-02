@@ -1,24 +1,5 @@
-OpenCV bindings requires "numpy" package.
-Install it via command:
-    pip install numpy
+GazeTracker: The user is focused
 The user seems focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
 GazeTracker: The user is zoned out
-GazeTracker: The user is zoned out
-GazeTracker: The user is focused
-GazeTracker: The user is zoned out
-GazeTracker: The user is zoned out
-GazeTracker: The user is zoned out
-GazeTracker: The user is zoned out
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
 GazeTracker: The user is zoned out
 GazeTracker: The user is zoned out

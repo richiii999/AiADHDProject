@@ -3,7 +3,7 @@ Demonstration of the GazeTracking library.
 Check the README.md for complete documentation.
 """
 
-import cv2_OLD as cv2
+import cv2
 import time
 from gaze_tracking import GazeTracking
 
