@@ -18,10 +18,8 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-AI = True # Quickly change if AI / cams run rather than commenting out
-CAM = True
-
-# TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
+AI, CAM = False, True # Quickly change if AI / cams run rather than commenting out
+startTime, initDelay, iterDelay = time.time(), 5, 10 # Timing delays
 
 def PromptAI(prompt):
     response = API.chat_with_collection(prompt)
@@ -39,17 +37,13 @@ def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt int
             f2.truncate(0)
             with open('./LLM/KnowledgePrompt.txt', 'r') as p2: f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
 
-    # TODO Delete history and knowledge file # There doesnt seem to be a way to delete files, so the .open-webui/uploads folder will keep growing 
+    # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
     API.remove_file_from_knowledge(knowledgeFileID) # Remove current Knowledge from KB (new one is uploaded on next start)
 
 def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     s = ''
     for line in f.readlines(): s += line.replace('\n',' ')
     return s
-
-startTime = time.time() ### Timing delays
-initDelay = 5 # Initial delay after starting LLM to wait for it to be ready for input
-iterDelay = 10 # delay for each iteration of prompting
 
 ### Sensors & Subprocesses
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -76,6 +70,7 @@ if CAM: # Setup virtual cam devices and split original cam input to them
 # Sensor processes which record data to be passed to the AI
 sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
 
+# TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
 KB = [ ### RAG Knowledge base
     './KB/Knowledge.txt', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
     './KB/ADHD2.pdf', # ADHD Information 1, Some strats
@@ -90,10 +85,10 @@ if AI: ### Initialization of LLM
     # Learning material upload & KB creation
     for path in KB:
         file_ID = API.upload_file(path) 
-        print(file_ID)
+        # print(file_ID)
         file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         
-        API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error ^^, reset API keys
+        API.add_file_to_knowledge(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
 

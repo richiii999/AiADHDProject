@@ -1,13 +1,8 @@
 FaceTracker: The user seems focused
-FaceTracker: The user seems focused
-FaceTracker: The user seems focused
-FaceTracker: The user seems focused
-FaceTracker: The user seems focused
 The user seems focused
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
-FaceTracker: The user seems distracted
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
@@ -23,13 +18,7 @@ FaceTracker: The user seems focused
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
-FaceTracker: The user seems distracted
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused
-FaceTracker: The user seems distracted
-FaceTracker: The user seems distracted
-FaceTracker: The user seems distracted
-FaceTracker: The user seems distracted
-FaceTracker: The user seems distracted
 FaceTracker: The user seems focused
 FaceTracker: The user seems focused

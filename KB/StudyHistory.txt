@@ -249,3 +249,18 @@ To reduce these distractions, I suggested the following actions:
 * Set a reminder to review notes every 30 minutes to stay on track
 
 END SUMMARY
+START SUMMARY
+
+Length of study session: The study session lasted for approximately 60 minutes.
+
+Topic of study: The topic of study is Organizational Behavior.
+
+Focus summary:
+
+The student started the study session with moderate focus (50%) on Organizational Behavior. At around 15-minute mark, the focus dropped to 20% due to a sudden increase in notifications from social media apps. I suggested that the student consider implementing the Pomodoro Technique, which involves working in focused 25-minute increments, followed by a 5-minute break.
+
+The student's focus gradually increased to 40% as they started taking breaks and adjusting their study environment. However, at around the 45-minute mark, the focus dropped again to 10% due to an unexpected phone call from a friend. I suggested that the student minimize distractions by putting their phone on silent mode and using noise-cancelling headphones.
+
+The student's focus remained low for the next 15 minutes before gradually increasing to 60% as they refocused on their study material. The remaining 10 minutes of the study session saw the student maintain a high level of focus (80%) on Organizational Behavior.
+
+END SUMMARY
