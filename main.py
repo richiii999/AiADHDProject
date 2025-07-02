@@ -8,6 +8,9 @@
 # sudo modprobe v4l2loopback video_nr=8,9,10 # Add video8/9 devices
     # v4l2-ctl --list-devices # Verify devices have appeared correctly
     # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
+# reset packages / uv / venv:
+    # delete all uv-related files and folders (.venv, uv.lock, pyproject.toml, .python-version)
+    # deactivate, then uv-init, uv python pin 3.11.13, uv add -r requirements.txt
 
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
@@ -52,8 +55,8 @@ iterDelay = 10 # delay for each iteration of prompting
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
     open('./Logs/faceTracker.txt', 'r+'),
-    open('./Logs/gazeTracker.txt', 'r+')
-    # open('./Logs/VLM.txt', 'r+')
+    open('./Logs/gazeTracker.txt', 'r+'),
+    open('./Logs/VLM.txt', 'r+')
 ]
 
 for f in logFiles: 
@@ -62,8 +65,8 @@ for f in logFiles:
 
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
-    'python ./Sensors/PythonGazeTracker/example.py'
-    # 'python ./Sensors/Moondream/main.py'
+    'python ./Sensors/PythonGazeTracker/example.py', 
+    'python ./Sensors/Moondream/main.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
