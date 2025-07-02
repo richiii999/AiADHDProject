@@ -1,3 +1,6 @@
+OpenCV bindings requires "numpy" package.
+Install it via command:
+    pip install numpy
 The user seems focused
 GazeTracker: The user is focused
 GazeTracker: The user is focused
