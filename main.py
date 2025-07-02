@@ -90,7 +90,7 @@ if AI: ### Initialization of LLM
     # Learning material upload & KB creation
     for path in KB:
         file_ID = API.upload_file(path) 
-        #print(file_ID)
+        print(file_ID)
         file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         
         API.add_file_to_knowledge(file_ID) # BUG: If you get 'meta' key error ^^, reset API keys

@@ -235,3 +235,17 @@ To reduce distractions during this period, I suggested the following actions:
 The student took a 5-minute break as recommended, and upon returning to their studies, they appeared to be more focused. The remaining 15 minutes of the study session were characterized by sustained focus and engagement with the material.
 
 END SUMMARY
+START SUMMARY
+
+The study session lasted for approximately 2 hours, during which the topic of focus was Organizational Behavior.
+
+According to the sensor data, the student was NOT distracted for the first 45 minutes, showing a high level of engagement and focus on the material. During this time, no distractions were detected by the monitoring AI.
+
+However, from minute 46 onwards, the student's focus began to waver, with brief periods of mild distraction every 10-15 minutes. These distractions lasted around 2-3 minutes each before the student refocused.
+
+To reduce these distractions, I suggested the following actions:
+
+* Take a 5-minute break after 1 hour of studying to stretch and recharge
+* Set a reminder to review notes every 30 minutes to stay on track
+
+END SUMMARY
