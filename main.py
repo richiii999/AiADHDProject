@@ -18,7 +18,7 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-AI = False # Quickly change if AI / cams run rather than commenting out
+AI = True # Quickly change if AI / cams run rather than commenting out
 CAM = True
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
@@ -105,7 +105,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
         sensorData += f.readlines()[-1]
     print(sensorData)
 
-    # subprocess.run(f'gnome-screenshot -f ./KB/ss.png', shell=True) # Take a ss for moondream
+    # subprocess.run(f'scrot ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: PromptAI(sensorData)
 
