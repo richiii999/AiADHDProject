@@ -21,8 +21,12 @@ tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
 ### AI ADHD stuff
 import time 
-prompt = "The user is viewing a document, what are the first two sentences on this document? If there is no text, say 'No text availible'" # If there does not appear to be a slide in the image then say 'The user seems distracted.'"
+prompt = "The user is viewing a document, what is the first sentence on this document? If there is no text, say 'Nothing detected'"
 delay = 5
 while True: 
-    print(("VLM: The user appears to be on the page which contains: " + model.answer_question(Image.open('./KB/ss.png'), prompt)).replace('\n',' '), flush=True)
-    time.sleep(5)
+    try: response = model.answer_question(Image.open('./KB/ss.png'), prompt).replace('\n',' ')
+    except: response = "Nothing detected"
+
+    if response == "Nothing detected" or str(response) == "null": print("VLM: " + response, flush=True)
+    else: print("VLM: The user appears to be on the page which contains: " + response, flush=True)
+    time.sleep(delay)

@@ -19,7 +19,7 @@ import time
 import API # ./API.py: Contains API calls to webui
 
 AI, CAM = False, True # Quickly change if AI / cams run rather than commenting out
-startTime, initDelay, iterDelay = time.time(), 5, 10 # Timing delays
+startTime, initDelay, iterDelay = time.time(), 5, 4 # Timing delays
 
 def PromptAI(prompt):
     response = API.chat_with_collection(prompt)
@@ -100,7 +100,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
         sensorData += f.readlines()[-1]
     print(sensorData)
 
-    # subprocess.run(f'scrot ./KB/ss.png', shell=True) # Take a ss for moondream
+    #subprocess.run(f'rm ./KB/ss.png; scrot ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: PromptAI(sensorData)
 
