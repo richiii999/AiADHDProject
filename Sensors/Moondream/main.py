@@ -27,6 +27,6 @@ while True:
     try: response = model.answer_question(Image.open('./KB/ss.png'), prompt).replace('\n',' ')
     except: response = "Nothing detected"
 
-    if response == "Nothing detected" or str(response) == "null": print("VLM: " + response, flush=True)
+    if response == "Nothing detected" or str(response) == "null": print("VLM: Nothing detected", flush=True)
     else: print("VLM: The user appears to be on the page which contains: " + response, flush=True)
     time.sleep(delay)
