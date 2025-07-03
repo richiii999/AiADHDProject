@@ -2,18 +2,17 @@
 # Manages the sensors via subprocesses and prompts the LLM via the webui API
 
 ### SETUP: Must be done before running (on separate terminals / in background)
-# Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
-# DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
-# DATA_DIR=./.open-webui open-webui@latest serve # Non-UV version of open-webui
-# sudo modprobe v4l2loopback video_nr=8,9,10 # Add video8/9 devices
-    # v4l2-ctl --list-devices # Verify devices have appeared correctly
-    # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
 # reset packages / uv / venv:
     # delete all uv-related files and folders (.venv, uv.lock, pyproject.toml, .python-version)
     # deactivate, then uv-init, uv python pin 3.11.13, uv add -r requirements.txt
+# Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
+# DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
+# sudo modprobe v4l2loopback video_nr=8,9 # Add video8/9 devices
+    # v4l2-ctl --list-devices # Verify devices have appeared correctly
+    # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
 # Connect Claude to openwebui: https://openwebui.com/f/justinrahb/anthropic
     # Download, then import from file on http://localhost:8080/admin/functions, 
-    # remove the top / bottom html stuff. Also delete extra models
+    # remove the top / bottom html stuff. Also delete extra models if not needed
     # Once imported, click the gear 'valves' and insert the API key, turn it on
 
 
@@ -27,11 +26,26 @@ import API # ./API.py: Contains API calls to webui
 
 AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
 startTime, initDelay, iterDelay = time.time(), 5, 20 # Timing delays
+AUDIO = True
+if AUDIO:
+    from gtts import gTTS
+    import pygame
 
 def PromptAI(prompt):
     response = API.chat_with_collection(prompt)
-    try: print(response['choices'][0]['message']['content']) 
-    except: print(response) # try-except to print the error if it fails (usually 'model not found')
+
+    try: # try-except to print the error if it fails (usually 'model not found')
+        response = response['choices'][0]['message']['content']
+        print(response)
+        if AUDIO: TTS(response)
+    except: print(response)
+
+def TTS(text):
+    myobj = gTTS(text)
+    myobj.save("response.mp3")
+    pygame.mixer.init()
+    pygame.mixer.music.load("response.mp3")
+    pygame.mixer.music.play()
 
 def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')

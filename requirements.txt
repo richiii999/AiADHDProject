@@ -1,3 +1,7 @@
+# Audio
+pygame
+gtts
+
 # Claude
 anthropic
 

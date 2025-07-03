@@ -1,18 +1,24 @@
 from gtts import gTTS
-
 import pygame
 
-mytext = "This is crazy that it works"
+import API
 
-language = "en"
+AUDIO = True
 
-myobj = gTTS(text=mytext, lang=language, slow=False)
+def PromptAI(prompt):
+    response = API.chat_with_model(prompt)
 
-myobj.save("welcome.mp3")
+    try: # try-except to print the error if it fails (usually 'model not found')
+        response = response['choices'][0]['message']['content']
+        print(response)
+        if AUDIO: TTS(response)
+    except: print(response)
 
-pygame.mixer.init()
+def TTS(text):
+    myobj = gTTS(text)
+    myobj.save("response.mp3")
+    pygame.mixer.init()
+    pygame.mixer.music.load("response.mp3")
+    pygame.mixer.music.play()
 
-pygame.mixer.music.load("welcome.mp3")
-
-
-pygame.mixer.music.play()
+while True: PromptAI("test")

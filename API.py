@@ -6,8 +6,13 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "justinrahb.claude-3-7-sonnet-20250219" # If using external, use the long name (grey name below)
+model = "llama3.2:1b" # If using external, use the long name (grey name below)
 base = "llama3:8b" # Default: "llama3.2:latest"
+
+# Models:
+# justinrahb.claude-3-7-sonnet-20250219
+# llama3.2:1b
+# llama3:8b
 
 ### Keys and links
 kb_id = "73ae866e-e7a9-4057-b9c6-abadf57b685b" 
