@@ -1,3 +1,6 @@
+# Claude
+anthropic
+
 # FaceTracker
 opencv-python
 mediapipe
