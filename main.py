@@ -16,6 +16,9 @@
     # remove the top / bottom html stuff. Also delete extra models
     # Once imported, click the gear 'valves' and insert the API key, turn it on
 
+
+#This is the audio test
+
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 import time
