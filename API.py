@@ -6,7 +6,7 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "ADHD:latest" 
+model = "justinrahb.claude-3-7-sonnet-20250219" # If using external, use the long name (grey name below)
 base = "llama3:8b" # Default: "llama3.2:latest"
 
 ### Keys and links

@@ -11,6 +11,10 @@
 # reset packages / uv / venv:
     # delete all uv-related files and folders (.venv, uv.lock, pyproject.toml, .python-version)
     # deactivate, then uv-init, uv python pin 3.11.13, uv add -r requirements.txt
+# Connect Claude to openwebui: https://openwebui.com/f/justinrahb/anthropic
+    # Download, then import from file on http://localhost:8080/admin/functions, 
+    # remove the top / bottom html stuff. Also delete extra models
+    # Once imported, click the gear 'valves' and insert the API key, turn it on
 
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
@@ -59,8 +63,8 @@ for f in logFiles:
 
 cmds = [ # Commands to run each sensor process
     'python ./Sensors/PythonFaceTracker/main.py',
-    'python ./Sensors/PythonGazeTracker/example.py', 
-    'python ./Sensors/Moondream/main.py'
+    'python ./Sensors/PythonGazeTracker/example.py'
+    # 'python ./Sensors/Moondream/main.py'
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
@@ -80,7 +84,7 @@ KB = [ ### RAG Knowledge base
 
 if AI: ### Initialization of LLM 
     # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
-    with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
+    # with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
 
     # Learning material upload & KB creation
     for path in KB:
@@ -99,7 +103,7 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
         sensorData += f.readlines()[-1]
     print(sensorData)
 
-    subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
+    # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: PromptAI(sensorData)
 
