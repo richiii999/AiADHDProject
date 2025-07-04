@@ -82,11 +82,11 @@ cmds = [ # Commands to run each sensor process
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split())
+    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
     time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
-sensors = [subprocess.Popen(cmds[i].split(), stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
+sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))] if CAM else [None]
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
 KB = [ ### RAG Knowledge base
@@ -98,15 +98,14 @@ KB = [ ### RAG Knowledge base
 
 if AI: ### Initialization of LLM 
     # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
-    # with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
+    with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
 
-    # Learning material upload & KB creation
-    for path in KB:
+    for path in KB: # Learning material upload & KB creation
         file_ID = API.upload_file(path) 
-        # print(file_ID)
-        file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
         
-        API.add_file_to_knowledge(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
+        API.add_file_to_knowledge(file_ID) 
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
 time.sleep(initDelay) # give servers & sensors time to start up
@@ -120,8 +119,8 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: 
-        PromptAI(input('\n>')) # Have the user respond to the AI
         PromptAI(sensorData) # Send sensor data to get list of options
+        PromptAI(input('\n>')) # Have the user respond to the AI, picking a choice
 
     time.sleep(iterDelay)
 
