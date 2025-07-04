@@ -97,8 +97,8 @@ KB = [ ### RAG Knowledge base
 ]
 
 if AI: ### Initialization of LLM 
-    # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found'
-    with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', shell=True)
+    # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found' # NOTE: Do not use and ' or " characters in the prompt
+    with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}" }}\'', stdout=subprocess.DEVNULL, shell=True)
 
     for path in KB: # Learning material upload & KB creation
         file_ID = API.upload_file(path) 
