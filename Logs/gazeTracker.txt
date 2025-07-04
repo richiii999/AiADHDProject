@@ -1,12 +1,1 @@
-GazeTracker: The user is focused
-GazeTracker: The user is focused
 The user seems focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused
-GazeTracker: The user is focused

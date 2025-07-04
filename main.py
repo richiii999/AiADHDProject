@@ -15,9 +15,6 @@
     # remove the top / bottom html stuff. Also delete extra models if not needed
     # Once imported, click the gear 'valves' and insert the API key, turn it on
 
-
-#This is the audio test
-
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 import time
@@ -26,7 +23,7 @@ import API # ./API.py: Contains API calls to webui
 
 AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
 startTime, initDelay, iterDelay = time.time(), 5, 20 # Timing delays
-AUDIO = True
+AUDIO = False
 if AUDIO:
     from gtts import gTTS
     import pygame
@@ -85,11 +82,11 @@ cmds = [ # Commands to run each sensor process
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet', shell=True)
+    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split())
     time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
-sensors = [subprocess.Popen(cmds[i], shell=True, stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
+sensors = [subprocess.Popen(cmds[i].split(), stdout=logFiles[i]) for i in range(len(cmds))] if CAM else [None]
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
 KB = [ ### RAG Knowledge base
@@ -122,7 +119,9 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
     # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
-    if AI: PromptAI(sensorData)
+    if AI: 
+        PromptAI(input('\n>')) # Have the user respond to the AI
+        PromptAI(sensorData) # Send sensor data to get list of options
 
     time.sleep(iterDelay)
 

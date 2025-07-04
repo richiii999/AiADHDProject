@@ -20,7 +20,7 @@ def TTS(text):
     pygame.mixer.init()
     pygame.mixer.music.load("response.mp3")
     pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy(): pygame.time.Clock().tick(10)
+    while pygame.mixer.music.get_busy(): pygame.time.Clock().tick(10) # Wait for response to finish before continuing
 
 while True: PromptAI("test")
 
