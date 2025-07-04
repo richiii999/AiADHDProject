@@ -33,7 +33,7 @@ context = [] # The chat history for the AI, needs to be passed each time per cha
 def PromptAI(prompt):
     global context
     context.append({"role":"user", "content": prompt.replace('\"','')})
-    response = API.chat_with_collection(context)
+    response = API.chat_with_model(context)
 
     try: # try-except to print the error if it fails (usually 'model not found')
         response = response['choices'][0]['message']['content']
