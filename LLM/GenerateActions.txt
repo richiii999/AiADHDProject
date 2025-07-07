@@ -1,2 +1,4 @@
 From the knowledge base and your knowledge about the user,
-create a list of 15 actions to take that may help the user reduce distractions when studying
+Create a list of 20 unique actions to take that may help the user reduce distractions while they are studying
+Prefer actions from the knowledge base.
+Phrase from the perspective of the student.

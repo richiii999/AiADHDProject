@@ -6,7 +6,7 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "llama3:8b" # If using external, use the long name (grey name below)
+model = "ADHD:latest" # If using external, use the long name (grey name below)
 base = "llama3:8b" # Default: "llama3.2:latest"
 
 # Models:
@@ -89,4 +89,18 @@ def remove_file_from_knowledge(file_id, knowledge_id=kb_id):
     }
     data = {'file_id': file_id}
     response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+def old_chat_with_collection(prompt, collection_id=kb_id, token=adminToken):
+    url = f'http://localhost:{localHostPort}/api/chat/completions'
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        'model': model,
+        'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
+        'files': [{'type': 'collection', 'id': collection_id}]
+    }
+    response = requests.post(url, headers=headers, json=payload)
     return response.json()
