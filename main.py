@@ -75,7 +75,7 @@ def sanitize(s): # Remove characters that cause issues from a str
     s = s.replace("\"", "")
     return s
 
-def UserInput(inputPrompt): pass # TODO user input verification. whenever 'q' by itself quits the main loop
+def UserInput(inputPrompt): pass # TODO user input verification. whenever 'q' by itself quits the main loop '' re-prompts, etc.
 
 ### Sensors & Subprocesses
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -96,10 +96,12 @@ cmds = [ # Commands to run each sensor process
 ]
 
 if CAM: # Setup virtual cam devices and split original cam input to them
+    print("Starting FFMPEG...")
     ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
     time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
+print("Starting sensors...")
 sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))] if CAM else [None]
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
@@ -116,6 +118,7 @@ KBStudy = [ # Knowledge base for the users study material
 # TODO make thise nested list instead and just dobule for loop
 
 if AI: ### Initialization of LLM 
+    print("Uploading files to knowledge base...")
     for path in KBExpert: # expert material upload & KB creation
         file_ID = API.upload_file(path) 
         try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
@@ -131,6 +134,7 @@ if AI: ### Initialization of LLM
         API.add_file_to_knowledge(file_ID, API.KBStudy) 
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
         
+    print("Getting action space via RAG...")
     with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
         context.append({"role":"user", "content":ReadFileAsLine(f1)})
         listResponse = API.chat_with_collection(context, API.KBExpert)['choices'][0]['message']['content']
@@ -139,7 +143,12 @@ if AI: ### Initialization of LLM
         sysprompt += listResponse
         context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
 
+print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
+modelNum = input(f"Please select a model # from the list: {API.Models}\n>")
+userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
+
+time.sleep(100)
 
 # TODO: Idea, change while condition to scan the sensor output (inner loop, outer loop still same, and with an OR condition for 60m or someth)
 # scan for distraction (requires standardized sensor output tho, I dont like that). 

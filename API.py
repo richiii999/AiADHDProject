@@ -9,9 +9,11 @@ localHostPort = "8080"
 model = "llama3:8b" # If using external, use the long name (grey name below)
 
 # Models: # TODO present this list to the user at the start and have them pick
-# justinrahb.claude-3-7-sonnet-20250219
-# llama3.2:1b
-# llama3:8b
+Models = [
+    "justinrahb.claude-3-7-sonnet-20250219",
+    "llama3.2:1b",
+    "llama3:8b"
+]
 
 ### Keys and links
 KBExpert = "c6716345-ca90-4b7f-9a94-edea122628e2" # 'Expert' Collection ID
