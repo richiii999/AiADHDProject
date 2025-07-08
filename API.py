@@ -53,7 +53,7 @@ def add_file_to_knowledge(file_id, knowledge_id = kb_id, token=adminToken):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-def chat_with_file(context, file_id, token=adminToken):
+def chat_with_file(prompt, file_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -61,7 +61,7 @@ def chat_with_file(context, file_id, token=adminToken):
     }
     payload = {
         'model': model,
-        'messages': context,
+        'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
         'files': [{'type': 'file', 'id': file_id}]
     }
     response = requests.post(url, headers=headers, json=payload)

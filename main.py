@@ -22,7 +22,7 @@ import time
 import API # ./API.py: Contains API calls to webui
 
 AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
-startTime, initDelay, iterDelay = time.time(), 5, 20 # Timing delays
+startTime, initDelay, iterDelay = time.time(), 5, 5 # Timing delays
 AUDIO = False
 if AUDIO:
     from gtts import gTTS
@@ -30,29 +30,30 @@ if AUDIO:
 
 context = [] # The chat history for the AI, needs to be passed each time per chat
 
-def PromptAI(prompt): # Prompt only, uses existing context
+def PromptAI(prompt) -> str: # Prompt only, uses existing context
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
     response = API.chat_with_collection(context)
 
     try: # try-except to print the error if it fails (usually 'model not found')
         response = response['choices'][0]['message']['content']
-        print(response)
         if AUDIO: TTS(response)
 
         context.append({"role":"assistant", "content":sanitize(response)})
+        return response
     except: print(response)
 
 def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
 
-    with open('./KB/StudyHistory.txt', 'a') as f1: 
-        with open('./LLM/SummaryPrompt.txt', 'r') as p1: f1.write('\n' + API.chat_with_model(ReadFileAsLine(p1))['choices'][0]['message']['content']) # Summary append to history file
-        historyID = API.upload_file('./KB/StudyHistory.txt') # Upload history
-        
-        with open('./KB/Knowledge.txt', 'r+') as f2: # Update the knowledge based on history + current session
-            f2.truncate(0)
-            with open('./LLM/KnowledgePrompt.txt', 'r') as p2: f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
+    # Update the knowledge based on history + current session
+    with open('./KB/StudyHistory.txt', 'a') as f1, open('./KB/Knowledge.txt', 'r+') as f2: # Summary and knowledge files
+        with open('./LLM/SummaryPrompt.txt', 'r') as p1, open('./LLM/KnowledgePrompt.txt', 'r') as p2: # Summary and knowledge prompts
+            f1.write('\n' + PromptAI(ReadFileAsLine(p1))) # Prompt Summary, append it to history file
+            historyID = API.upload_file('./KB/StudyHistory.txt') # Upload history
+            
+            f2.truncate(0) # Replace old knowledge with new knowledge
+            f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
 
     # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
     API.remove_file_from_knowledge(knowledgeFileID) # Remove current Knowledge from KB (new one is uploaded on next start)
@@ -73,6 +74,8 @@ def sanitize(s): # Remove characters that cause issues from a str
     s = s.replace("\'", "")
     s = s.replace("\"", "")
     return s
+
+def UserInput(inputPrompt): pass # TODO user input verification
 
 ### Sensors & Subprocesses
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -135,8 +138,8 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
     if AI: 
-        PromptAI(sensorData) # Send sensor data to get list of options
-        PromptAI(input('\n>')) # Have the user respond to the AI, picking a choice
+        print(PromptAI(sensorData)) # Send sensor data to get list of options
+        print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
 
     time.sleep(iterDelay)
 

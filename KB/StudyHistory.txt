@@ -28,3 +28,22 @@ To reduce distractions and promote focus during future study sessions, I suggest
 * Utilizing visual reminders and organization tools to stay on track
 
 END SUMMARY
+START SUMMARY
+
+This study session focused on Organizational Behavior (OB 354) topics, including Teams: Processes and Communication, Leadership: Power and Negotiation, and Conflict Resolution.
+
+The sensor data indicates that you started this study session in a focused state, with no signs of distraction. You remained focused throughout the initial 23 minutes of the session, making progress on your Organizational Behavior material.
+
+After 64 minutes, you took a short break to stretch, move around, and refresh your mind, which was suggested as an action to maintain focus and reduce distractions.
+
+END SUMMARY
+START SUMMARY
+
+The student has been studying Organizational Behavior for [insert time] minutes. During this study session, actions to reduce distraction included:
+
+* Eliminating digital distractions
+* Breaking tasks into smaller chunks
+
+Sensor data suggests that the student was focused throughout the study session.
+
+END SUMMARY
