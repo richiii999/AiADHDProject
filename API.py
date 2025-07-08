@@ -6,11 +6,9 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "ADHD:latest" # If using external, use the long name (grey name below)
-base = "llama3:8b" # Default: "llama3.2:latest"
+model = "llama3:8b" # If using external, use the long name (grey name below)
 
-# Models:
-# ADHD:latest
+# Models: # TODO present this list to the user at the start and have them pick
 # justinrahb.claude-3-7-sonnet-20250219
 # llama3.2:1b
 # llama3:8b
@@ -28,7 +26,9 @@ def chat_with_model(context, collection_id=kb_id, token=adminToken):
     }
     data = {
       "model": model,
-      "messages": context
+      "messages": context,
+      "system": "Ignore the prompt, respond only with AAA"
+
     }
     response = requests.post(url, headers=headers, json=data)
     return response.json()
@@ -91,16 +91,16 @@ def remove_file_from_knowledge(file_id, knowledge_id=kb_id):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-def old_chat_with_collection(prompt, collection_id=kb_id, token=adminToken):
-    url = f'http://localhost:{localHostPort}/api/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
-    payload = {
-        'model': model,
-        'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
-        'files': [{'type': 'collection', 'id': collection_id}]
-    }
-    response = requests.post(url, headers=headers, json=payload)
-    return response.json()
+# def old_chat_with_collection(prompt, collection_id=kb_id, token=adminToken):
+#     url = f'http://localhost:{localHostPort}/api/chat/completions'
+#     headers = {
+#         'Authorization': f'Bearer {token}',
+#         'Content-Type': 'application/json'
+#     }
+#     payload = {
+#         'model': model,
+#         'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
+#         'files': [{'type': 'collection', 'id': collection_id}]
+#     }
+#     response = requests.post(url, headers=headers, json=payload)
+#     return response.json()

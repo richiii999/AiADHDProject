@@ -102,25 +102,21 @@ KB = [ ### RAG Knowledge base
     './KB/OB_CH13.pptx' # Study Material 1
 ]
 
-if AI: ### Initialization of LLM 
-    # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found' # NOTE: Do not use and ' or " characters in the prompt
-    # with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}", "stream":false }}\'', stdout=subprocess.DEVNULL, shell=True)
+# if AI: ### Initialization of LLM 
+#     # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found' # NOTE: Do not use and ' or " characters in the prompt
+#     # with open("./LLM/SysPrompt.txt", 'r') as f: subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{ReadFileAsLine(f)}", "stream":false }}\'', stdout=subprocess.DEVNULL, shell=True)
 
 
-    for path in KB: # Learning material upload & KB creation
-        file_ID = API.upload_file(path) 
-        try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-        except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
+#     for path in KB: # Learning material upload & KB creation
+#         file_ID = API.upload_file(path) 
+#         try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+#         except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
         
-        API.add_file_to_knowledge(file_ID) 
-        if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
+#         API.add_file_to_knowledge(file_ID) 
+#         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
 
-time.sleep(initDelay) # give servers & sensors time to start up
-""""""
-response = ""
-with open('./LLM/GenerateActions.txt', 'r') as p1:
-    response =  API.old_chat_with_collection(ReadFileAsLine(p1)) # Summary append to history file
-    print(response['choices'][0]['message']['content'])
-        #historyID = API.upload_file('./KB/StudyHistory.txt') # Upload history
-        
+# time.sleep(initDelay) # give servers & sensors time to start up
 
+time.sleep(5)
+print("prompted AI")
+PromptAI("test")

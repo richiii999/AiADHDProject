@@ -30,25 +30,18 @@ if AUDIO:
 
 context = [] # The chat history for the AI, needs to be passed each time per chat
 
-def PromptAI(prompt):
+def PromptAI(prompt): # Prompt only, uses existing context
     global context
-    context.append({"role":"user", "content":prompt.replace('\"','')})
-    response = API.chat_with_model(context)
+    context.append({"role":"user", "content":sanitize(prompt)})
+    response = API.chat_with_collection(context)
 
     try: # try-except to print the error if it fails (usually 'model not found')
         response = response['choices'][0]['message']['content']
         print(response)
         if AUDIO: TTS(response)
 
-        context.append({"role":"assistant", "content":response.replace('\"','')})
+        context.append({"role":"assistant", "content":sanitize(response)})
     except: print(response)
-
-def TTS(text):
-    myobj = gTTS(text)
-    myobj.save("response.mp3")
-    pygame.mixer.init()
-    pygame.mixer.music.load("response.mp3")
-    pygame.mixer.music.play()
 
 def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
@@ -64,9 +57,21 @@ def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt int
     # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
     API.remove_file_from_knowledge(knowledgeFileID) # Remove current Knowledge from KB (new one is uploaded on next start)
 
+def TTS(text):
+    myobj = gTTS(text)
+    myobj.save("response.mp3")
+    pygame.mixer.init()
+    pygame.mixer.music.load("response.mp3")
+    pygame.mixer.music.play()
+
 def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     s = ''
-    for line in f.readlines(): s += line.replace('\n',' ')
+    for line in f.readlines(): s += sanitize(line).replace('\n',' ')
+    return s
+
+def sanitize(s): # Remove characters that cause issues from a str
+    s = s.replace("\'", "")
+    s = s.replace("\"", "")
     return s
 
 ### Sensors & Subprocesses
@@ -102,32 +107,22 @@ KB = [ ### RAG Knowledge base
     './KB/OB_CH13.pptx' # Study Material 1
 ]
 
-def sanitize(stra):
-    stra = stra.replace("\'", "")
-    stra = stra.replace("\"", "")
-    return stra
 
 if AI: ### Initialization of LLM 
-    # Set system prompt from file # BUG: Need to manually refresh webui page when newly created, else 'model not found' # NOTE: Do not use and ' or " characters in the prompt
-
-
     for path in KB: # Learning material upload & KB creation
         file_ID = API.upload_file(path) 
         try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
         API.add_file_to_knowledge(file_ID) 
-        
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
         
-        response = ""
-        with open('./LLM/GenerateActions.txt', 'r') as p1:
-            response =  API.old_chat_with_collection(ReadFileAsLine(p1)) # Summary append to history file
-            #print(response['choices'][0]['message']['content'])
-            response =response['choices'][0]['message']['content']
-            with open("./LLM/SysPrompt.txt", 'r+') as f: 
-                subprocess.run(f'curl http://localhost:11434/api/create -d \'{{ "model": "{API.model}", "from": "{API.base}", "system": "{sanitize(ReadFileAsLine(f) + response) }", "stream":false }}\'', stdout=subprocess.DEVNULL, shell=True)
+    with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
+        context.append({"role":"user", "content":ReadFileAsLine(f1)})
+        listResponse = API.chat_with_collection(context)['choices'][0]['message']['content']
 
-
+        sysprompt = ReadFileAsLine(f2)
+        sysprompt += listResponse
+        context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
 
 time.sleep(initDelay) # give servers & sensors time to start up
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
