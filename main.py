@@ -33,7 +33,7 @@ context = [] # The chat history for the AI, needs to be passed each time per cha
 def PromptAI(prompt) -> str: # Prompt only, uses existing context
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
-    response = API.chat_with_collection(context)
+    response = API.chat_with_collection(context, KBStudy)
 
     try: # try-except to print the error if it fails (usually 'model not found')
         response = response['choices'][0]['message']['content']
@@ -56,7 +56,7 @@ def EndStudySession(knowledgeFileID): # Writes the response to summaryPrompt int
             f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
 
     # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
-    API.remove_file_from_knowledge(knowledgeFileID) # Remove current Knowledge from KB (new one is uploaded on next start)
+    API.remove_file_from_knowledge(knowledgeFileID, API.KBStudy) # Remove current Knowledge from KB (new one is uploaded on next start)
 
 def TTS(text):
     myobj = gTTS(text)
@@ -75,7 +75,7 @@ def sanitize(s): # Remove characters that cause issues from a str
     s = s.replace("\"", "")
     return s
 
-def UserInput(inputPrompt): pass # TODO user input verification
+def UserInput(inputPrompt): pass # TODO user input verification. whenever 'q' by itself quits the main loop
 
 ### Sensors & Subprocesses
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -103,31 +103,46 @@ if CAM: # Setup virtual cam devices and split original cam input to them
 sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))] if CAM else [None]
 
 # TODO maybe swtich KB to a dict and have fileIDs as keys so can just loop over it and remove all fileids from the kb at end, also fixes duplicate warnings
-KB = [ ### RAG Knowledge base
-    './KB/Knowledge.txt', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
+### RAG 
+KBExpert = [ # Knowledge base for the expert knowledge the AI uses to make it's action space
     './KB/ADHD2.pdf', # ADHD Information 1, Some strats
-    './KB/TeachingADHD.pdf', # ADHD Information 2, Good strats like quizzes and summaries
-    './KB/OB_CH13.pptx' # Study Material 1
+    './KB/TeachingADHD.pdf' # ADHD Information 2, Good strats like quizzes and summaries
 ]
 
+KBStudy = [ # Knowledge base for the users study material
+    './KB/Knowledge.txt', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
+    './KB/OB_CH13.pptx' # Study Material 1
+]
+# TODO make thise nested list instead and just dobule for loop
 
 if AI: ### Initialization of LLM 
-    for path in KB: # Learning material upload & KB creation
+    for path in KBExpert: # expert material upload & KB creation
         file_ID = API.upload_file(path) 
         try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
-        API.add_file_to_knowledge(file_ID) 
+        
+        API.add_file_to_knowledge(file_ID, API.KBExpert)
+
+    for path in KBStudy: # Learning material upload & KB creation
+        file_ID = API.upload_file(path) 
+        try: file_ID = file_ID['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        except: print(file_ID) # NOTE: If you get 'meta' key error ^^, reset API keys
+        
+        API.add_file_to_knowledge(file_ID, API.KBStudy) 
         if knowledgeFileID == "": knowledgeFileID = file_ID # The first file uploaded is the study history file, which we dont want duplicates for
         
     with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
         context.append({"role":"user", "content":ReadFileAsLine(f1)})
-        listResponse = API.chat_with_collection(context)['choices'][0]['message']['content']
+        listResponse = API.chat_with_collection(context, API.KBExpert)['choices'][0]['message']['content']
 
         sysprompt = ReadFileAsLine(f2)
         sysprompt += listResponse
         context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
 
 time.sleep(initDelay) # give servers & sensors time to start up
+
+# TODO: Idea, change while condition to scan the sensor output (inner loop, outer loop still same, and with an OR condition for 60m or someth)
+# scan for distraction (requires standardized sensor output tho, I dont like that). 
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
     for f in logFiles: # Get most recent output per sensor 

@@ -14,11 +14,12 @@ model = "llama3:8b" # If using external, use the long name (grey name below)
 # llama3:8b
 
 ### Keys and links
-kb_id = "63d72707-8d99-4b09-a331-2c1ce85953ac" 
+KBExpert = "c6716345-ca90-4b7f-9a94-edea122628e2" # 'Expert' Collection ID
+KBStudy = "f2dab4e7-c42c-40fa-915f-c6ad24772b4a" # 'Study' Collection ID
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 
 ### API
-def chat_with_model(context, collection_id=kb_id, token=adminToken):
+def chat_with_model(context, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -43,7 +44,7 @@ def upload_file(file_path, token=adminToken):
     response = requests.post(url, headers=headers, files=files)
     return response.json()
 
-def add_file_to_knowledge(file_id, knowledge_id = kb_id, token=adminToken):
+def add_file_to_knowledge(file_id, knowledge_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/v1/knowledge/{knowledge_id}/file/add'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -67,7 +68,7 @@ def chat_with_file(prompt, file_id, token=adminToken):
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
-def chat_with_collection(context, collection_id=kb_id, token=adminToken):
+def chat_with_collection(context, collection_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -81,7 +82,7 @@ def chat_with_collection(context, collection_id=kb_id, token=adminToken):
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
-def remove_file_from_knowledge(file_id, knowledge_id=kb_id):
+def remove_file_from_knowledge(file_id, knowledge_id):
     url = f'http://localhost:{localHostPort}/api/v1/knowledge/{knowledge_id}/file/remove'
     headers = {
         'Authorization': f'Bearer {adminToken}',
@@ -91,7 +92,7 @@ def remove_file_from_knowledge(file_id, knowledge_id=kb_id):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-# def old_chat_with_collection(prompt, collection_id=kb_id, token=adminToken):
+# def old_chat_with_collection(prompt, collection_id, token=adminToken):
 #     url = f'http://localhost:{localHostPort}/api/chat/completions'
 #     headers = {
 #         'Authorization': f'Bearer {token}',

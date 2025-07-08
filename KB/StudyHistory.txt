@@ -47,3 +47,24 @@ The student has been studying Organizational Behavior for [insert time] minutes.
 Sensor data suggests that the student was focused throughout the study session.
 
 END SUMMARY
+START SUMMARY
+
+This study session lasted for approximately 57 minutes. The topic of study is not specified in the sensor data.
+
+The student started off focused, as indicated by the aggregated sensor data, and maintained a high level of focus over the course of the session. No distractions were detected or mentioned in the sensor data.
+
+Actions suggested to reduce distraction included taking a short break, working on challenging material early in the day, using visual cues to stay focused, breaking down long-term projects into smaller segments, and reviewing and reflecting on what was learned at the end of each study session.
+
+END SUMMARY
+START SUMMARY
+
+Student Study Session Summary:
+
+Length: 36 minutes
+Topic of Study: Unspecified (based on sensor data)
+
+The study session started with an initial focus assessment indicating that the user seemed focused. Throughout the session, the FaceTracker and GazeTracker sensors consistently showed that the user remained focused, with no signs of distraction or decreased attention.
+
+During this time, I suggested a range of actions to help maintain focus, including reviewing what had been covered, pushing forward with study material, taking short breaks, summarizing learned information, creating mental notes, and previewing upcoming material. The student chose to keep pushing forward with their study material and later created a mental note of what they needed to focus on next.
+
+END SUMMARY
