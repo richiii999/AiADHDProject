@@ -75,7 +75,13 @@ def sanitize(s): # Remove characters that cause issues from a str
     s = s.replace("\"", "")
     return s
 
-def UserInput(inputPrompt): pass # TODO user input verification. whenever 'q' by itself quits the main loop '' re-prompts, etc.
+def UserInput(inputPrompt, validinput=None) -> str: # User input verification. whenever 'q' by itself quits the main loop '' re-prompts, etc.
+    i = input(inputPrompt)
+    while i not in validinput:
+        print("Invalid input, try again")
+        time.sleep(1)
+        i = input(inputPrompt)
+    return i
 
 ### Sensors & Subprocesses
 knowledgeFileID = "" # Used to store the file id of the studyhistory.txt file on webui, so it can be updated without duplication later
@@ -118,6 +124,11 @@ KBStudy = [ # Knowledge base for the users study material
 # TODO make thise nested list instead and just dobule for loop
 
 if AI: ### Initialization of LLM 
+    modelNum = UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))])
+    userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
+
+    time.sleep(100)
+
     print("Uploading files to knowledge base...")
     for path in KBExpert: # expert material upload & KB creation
         file_ID = API.upload_file(path) 
@@ -145,13 +156,10 @@ if AI: ### Initialization of LLM
 
 print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
-modelNum = input(f"Please select a model # from the list: {API.Models}\n>")
-userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
 
 time.sleep(100)
 
-# TODO: Idea, change while condition to scan the sensor output (inner loop, outer loop still same, and with an OR condition for 60m or someth)
-# scan for distraction (requires standardized sensor output tho, I dont like that). 
+# TODO: automatic prompt (vs timer prompt), have a bkg (no context) prompt, then only if 'yes' respond, do main prompt, else continue loop (20s between)
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
     for f in logFiles: # Get most recent output per sensor 
