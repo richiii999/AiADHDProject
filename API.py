@@ -6,6 +6,7 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1MTJhMjRjLTQ5YmMtNDFkYS1hMDQ2LTQ1MzFjNGQ1MGY1OSJ9.hS94_5e9x9G8sVmZbqmS2WFX7iB09ylCHWkbOI5bQu4'
 
 Models = [
     "justinrahb.claude-3-7-sonnet-20250219",
@@ -13,12 +14,44 @@ Models = [
     "llama3:8b"
 ]
 
+# Thanks to https://github.com/open-webui/open-webui/discussions/11761
+def create_knowledge(name:str, description:str, data:dict={}, access_control:dict={}, token=adminToken):
+    url=f"http://localhost:{localHostPort}/api/v1/knowledge/create"
+    headers = {
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+                'data': f"name: '{name}',description: '{description}'"
+    }
+    payload = {
+    "name": f"{name}",
+    "description": f'{description}',
+    "data": data,
+    "access_control": access_control
+    }
+    
+    response = requests.post(url, headers=headers, json=payload)
+    return response.json()
+
+def delete_knowledge(kbid:str, token=adminToken):
+    url=f"http://localhost:{localHostPort}/api/v1/knowledge/{kbid}/delete"
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json',
+    }
+    
+    response = requests.delete(url, headers=headers)
+    return response.json()
+
 ### Keys and links
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 KBIDs = [ # TODO change to dict perhaps
-    "c6716345-ca90-4b7f-9a94-edea122628e2", # 'Expert' Collection ID
-    "f2dab4e7-c42c-40fa-915f-c6ad24772b4a" # 'Study' Collection ID
+    create_knowledge('Expert', 'asdf')['id'], 
+    create_knowledge('Study', 'asdf')['id']
 ]
+print(KBIDs)
+import time
+time.sleep(2)
+for i in KBIDs: print(delete_knowledge(i))
+time.sleep(100)
 
 ### API
 def chat_with_model(model, context, token=adminToken):

@@ -78,8 +78,6 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification. w
 AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
 startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
 
-context = [] # The chat history for the AI, needs to be passed each time per chat
-
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))]))
 userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
 
@@ -87,6 +85,8 @@ AUDIO = UserInput("Would you like Audio? (y/N)\n>", ['y','n',''])
 if AUDIO == 'y':
     from gtts import gTTS
     import pygame
+
+context = [] # The chat history for the AI, needs to be passed each time per chat
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
