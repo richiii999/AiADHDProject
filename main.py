@@ -88,29 +88,23 @@ if AUDIO == 'y':
 context = [] # The chat history for the AI, needs to be passed each time per chat
 
 ### Sensors & Subprocesses
-logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
-    open('./Logs/faceTracker.txt', 'r+'),
-    open('./Logs/gazeTracker.txt', 'r+'),
-    open('./Logs/VLM.txt', 'r+')
-]
-
-for f in logFiles: 
-    f.truncate(0) # Empty old logs
-    f.write('The user seems focused\n') # Placeholder first log entry
-
-cmds = [ # Commands to run each sensor process
-    'python ./Sensors/PythonFaceTracker/main.py',
-    'python ./Sensors/PythonGazeTracker/example.py'
-    # 'python ./Sensors/Moondream/main.py'
-]
-
 print("Starting FFMPEG...") # Setup virtual cam devices and split original cam input to them
 ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
 time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
+procs = { # {path : Log file}, sensor output is periodically read from here and given to the AI
+    'python ./Sensors/PythonFaceTracker/main.py' : open('./Logs/faceTracker.txt', 'r+'),
+    'python ./Sensors/PythonGazeTracker/example.py' : open('./Logs/gazeTracker.txt', 'r+')
+    # 'python ./Sensors/Moondream/main.py' : open('./Logs/VLM.txt', 'r+')
+}
+
+for f in procs.values(): 
+    f.truncate(0) # Empty old logs
+    f.write('The user seems focused\n') # Placeholder first log entry
+
 # Sensor processes which record data to be passed to the AI
 print("Starting sensors...")
-sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))]
+sensors = [subprocess.Popen(path.split(), stderr=subprocess.DEVNULL, stdout=log, stdin=subprocess.DEVNULL) for path,log in procs]
 
 KB = [ ### RAG 
     { # Expert knowledge the AI uses to make it's action space
