@@ -16,8 +16,10 @@ Models = [
 ]
 
 ### Keys and links
-KBExpert = "c6716345-ca90-4b7f-9a94-edea122628e2" # 'Expert' Collection ID
-KBStudy = "f2dab4e7-c42c-40fa-915f-c6ad24772b4a" # 'Study' Collection ID
+KBIDs = [ # TODO change to dict perhaps
+    "c6716345-ca90-4b7f-9a94-edea122628e2", # 'Expert' Collection ID
+    "f2dab4e7-c42c-40fa-915f-c6ad24772b4a" # 'Study' Collection ID
+]
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 
 ### API

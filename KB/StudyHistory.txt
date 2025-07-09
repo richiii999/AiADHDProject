@@ -68,3 +68,16 @@ The study session started with an initial focus assessment indicating that the u
 During this time, I suggested a range of actions to help maintain focus, including reviewing what had been covered, pushing forward with study material, taking short breaks, summarizing learned information, creating mental notes, and previewing upcoming material. The student chose to keep pushing forward with their study material and later created a mental note of what they needed to focus on next.
 
 END SUMMARY
+START SUMMARY
+
+Based on the sensor data, I can analyze the student's study session history to summarize their focus during this study session.
+
+The length of the study session is unknown, but it appears that the student has been dedicating around 30-60 minutes per session [1]. The topic of study is not explicitly mentioned, but based on the provided context, it seems that the study material is present in the knowledge base and some info about past study sessions.
+
+According to the study session history, I suggest the following actions to reduce distraction:
+
+* Minimize distractions during study sessions by keeping the environment quiet and comfortable [14]
+* Break up study sessions into shorter intervals with frequent breaks to maintain focus [15]
+* Remove digital distractions like phones or social media during study time [16]
+
+END SUMMARY
