@@ -6,9 +6,7 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-model = "llama3:8b" # If using external, use the long name (grey name below)
 
-# Models: # TODO present this list to the user at the start and have them pick
 Models = [
     "justinrahb.claude-3-7-sonnet-20250219",
     "llama3.2:1b",
@@ -16,14 +14,14 @@ Models = [
 ]
 
 ### Keys and links
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 KBIDs = [ # TODO change to dict perhaps
     "c6716345-ca90-4b7f-9a94-edea122628e2", # 'Expert' Collection ID
     "f2dab4e7-c42c-40fa-915f-c6ad24772b4a" # 'Study' Collection ID
 ]
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxOTBjYTQ1LTgxNzgtNGQ4NC1hYTAwLTNmYTQ4MWFiM2MwMiJ9.z2lI5wfu3uvuZ4ImS-QI3aEceiu1n-NhsIS2Yn-FfPE'
 
 ### API
-def chat_with_model(context, token=adminToken):
+def chat_with_model(model, context, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -58,7 +56,7 @@ def add_file_to_knowledge(file_id, knowledge_id, token=adminToken):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-def chat_with_file(prompt, file_id, token=adminToken):
+def chat_with_file(model, prompt, file_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -72,7 +70,7 @@ def chat_with_file(prompt, file_id, token=adminToken):
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
-def chat_with_collection(context, collection_id, token=adminToken):
+def chat_with_collection(model, context, collection_id, token=adminToken):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
     headers = {
         'Authorization': f'Bearer {token}',
@@ -95,17 +93,3 @@ def remove_file_from_knowledge(file_id, knowledge_id):
     data = {'file_id': file_id}
     response = requests.post(url, headers=headers, json=data)
     return response.json()
-
-# def old_chat_with_collection(prompt, collection_id, token=adminToken):
-#     url = f'http://localhost:{localHostPort}/api/chat/completions'
-#     headers = {
-#         'Authorization': f'Bearer {token}',
-#         'Content-Type': 'application/json'
-#     }
-#     payload = {
-#         'model': model,
-#         'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
-#         'files': [{'type': 'collection', 'id': collection_id}]
-#     }
-#     response = requests.post(url, headers=headers, json=payload)
-#     return response.json()

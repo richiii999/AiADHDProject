@@ -21,19 +21,10 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
-startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
-AUDIO = False
-if AUDIO:
-    from gtts import gTTS
-    import pygame
-
-context = [] # The chat history for the AI, needs to be passed each time per chat
-
 def PromptAI(prompt) -> str: # Prompt only, uses existing context
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
-    response = API.chat_with_collection(context, API.KBIDs[1])
+    response = API.chat_with_collection(API.Models[modelNum], context, API.KBIDs[1])
 
     try: # try-except to print the error if it fails (usually 'model not found')
         response = response['choices'][0]['message']['content']
@@ -46,19 +37,20 @@ def PromptAI(prompt) -> str: # Prompt only, uses existing context
 def EndStudySession(): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
 
-    # Update the knowledge based on history + current session
-    with open('./KB/StudyHistory.txt', 'a') as f1, open('./KB/Knowledge.txt', 'r+') as f2: # Summary and knowledge files
-        with open('./LLM/SummaryPrompt.txt', 'r') as p1, open('./LLM/KnowledgePrompt.txt', 'r') as p2: # Summary and knowledge prompts
-            f1.write('\n' + PromptAI(ReadFileAsLine(p1))) # Prompt Summary, append it to history file
-            historyID = API.upload_file('./KB/StudyHistory.txt') # Upload history
-            
-            f2.truncate(0) # Replace old knowledge with new knowledge
-            f2.write(API.chat_with_file(ReadFileAsLine(p2), historyID)['choices'][0]['message']['content'])
+    with open('./KB/StudyHistory.txt', 'a') as f1, open('./LLM/SummaryPrompt.txt', 'r') as p: 
+        f1.write('\n' + PromptAI(ReadFileAsLine(p))) # Prompt Summary, append it to history file
+
+    with open('./KB/StudyHistory.txt', 'r') as f1, open('./KB/Knowledge.txt', 'w') as f2, open('./LLM/KnowledgePrompt.txt', 'r') as p:
+        global context
+        context = [] # reset the context
+
+        f2.truncate(0) # Replace old knowledge with new knowledge
+        f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
     # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
     API.remove_file_from_knowledge(KB[1]['./KB/Knowledge.txt'], API.KBIDs[1]) # Remove current Knowledge from KB (new one is uploaded on next start)
 
-def TTS(text):
+def TTS(text): # Text to speech
     myobj = gTTS(text)
     myobj.save("response.mp3")
     pygame.mixer.init()
@@ -70,7 +62,7 @@ def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
     for line in f.readlines(): s += sanitize(line).replace('\n',' ')
     return s
 
-def sanitize(s): # Remove characters that cause issues from a str
+def sanitize(s) -> str: # Remove characters that cause issues from a str
     s = s.replace("\'", "")
     s = s.replace("\"", "")
     return s
@@ -82,6 +74,19 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification. w
         time.sleep(1)
         i = input(inputPrompt)
     return i
+
+AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
+startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
+
+context = [] # The chat history for the AI, needs to be passed each time per chat
+
+modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))]))
+userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
+
+AUDIO = UserInput("Would you like Audio? (y/N)\n>", ['y','n',''])
+if AUDIO == 'y':
+    from gtts import gTTS
+    import pygame
 
 ### Sensors & Subprocesses
 logFiles = [ # Log files, sensor output is periodically read from here and given to the AI
@@ -121,9 +126,6 @@ KB = [ ### RAG
 ]
 
 if AI: ### Initialization of LLM 
-    modelNum = UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))])
-    userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
-
     print("Uploading files to knowledge base...")
     for i in range(len(KB)): # wtf cant double iterate the list for some reason
         for file in KB[i].keys(): # NOTE: If you get 'meta' key error vv, reset API keys
@@ -134,7 +136,7 @@ if AI: ### Initialization of LLM
     print("Getting action space via RAG...")
     with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
         context.append({"role":"user", "content":ReadFileAsLine(f1)})
-        listResponse = API.chat_with_collection(context, API.KBIDs[0])['choices'][0]['message']['content']
+        listResponse = API.chat_with_collection(API.Models[modelNum],context, API.KBIDs[0])['choices'][0]['message']['content']
 
         sysprompt = ReadFileAsLine(f2)
         sysprompt += listResponse
