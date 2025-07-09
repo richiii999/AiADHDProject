@@ -133,3 +133,16 @@ To reduce distractions and promote focus during future study sessions, the follo
 * Utilizing visual reminders and organization tools to stay on track
 
 END SUMMARY
+**START SUMMARY**
+
+Based on the provided sensor data, here is a summary of the student's focus over the course of this study session:
+
+The study session lasted for 81 minutes, which is well within the recommended 30-60 minute duration. The student focused on Organizational Behavior (OB 354) topics throughout most of the session, with only brief moments of distraction.
+
+During the first 40 minutes of the session, the student was engaged and focused, with a steady gaze and minimal breaks. However, around the 45-minute mark, the student's focus began to waver slightly, and they started to look away from their notes for a few seconds before refocusing.
+
+Despite this brief distraction, the student remained relatively engaged and productive during the remainder of the session, using actions such as minimizing digital distractions, breaking up study sessions into shorter intervals with frequent breaks, removing unnecessary items from their study space, and using a website blocker to limit access to distracting websites.
+
+The final 11 minutes of the session were spent focusing intensely on the material, with the student maintaining a steady gaze and minimal breaks. This suggests that the student was able to sustain their focus and productivity throughout the majority of the study session, despite some brief moments of distraction.
+
+**END SUMMARY**

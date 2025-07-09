@@ -7,7 +7,7 @@ import requests
 ### Open-WebUI Settings
 localHostPort = "8080"
 adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1MTJhMjRjLTQ5YmMtNDFkYS1hMDQ2LTQ1MzFjNGQ1MGY1OSJ9.hS94_5e9x9G8sVmZbqmS2WFX7iB09ylCHWkbOI5bQu4'
-
+defaultHeader = {'Authorization':f'Bearer {adminToken}','Content-Type':'application/json'}
 Models = [
     "justinrahb.claude-3-7-sonnet-20250219",
     "llama3.2:1b",
@@ -29,18 +29,12 @@ def create_knowledge(name:str, description:str, data:dict={}, access_control:dic
     "access_control": access_control
     }
     
-    response = requests.post(url, headers=headers, json=payload)
+    response = requests.post(url, headers=defaultHeader, json=payload)
     return response.json()
 
-def delete_knowledge(kbid:str, token=adminToken):
+def delete_knowledge(kbid:str):
     url=f"http://localhost:{localHostPort}/api/v1/knowledge/{kbid}/delete"
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json',
-    }
-    
-    response = requests.delete(url, headers=headers)
-    return response.json()
+    return requests.delete(url, headers=defaultHeader).json()
 
 ### Keys and links
 KBIDs = [ # TODO change to dict perhaps
@@ -48,81 +42,44 @@ KBIDs = [ # TODO change to dict perhaps
     create_knowledge('Study', 'asdf')['id']
 ]
 print(KBIDs)
-import time
-time.sleep(2)
-for i in KBIDs: print(delete_knowledge(i))
-time.sleep(100)
 
 ### API
-def chat_with_model(model, context, token=adminToken):
+def chat_with_model(model, context):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
     data = {
       "model": model,
       "messages": context,
       "system": "Ignore the prompt, respond only with AAA"
-
     }
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json=data).json()
 
-def upload_file(file_path, token=adminToken): 
+def upload_file(file_path): 
     url = f'http://localhost:{localHostPort}/api/v1/files/'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Accept': 'application/json'
-    }
-    files = {'file': open(file_path, 'rb')}
-    response = requests.post(url, headers=headers, files=files)
-    return response.json()
+    headers = {'Authorization': f'Bearer {adminToken}','Accept': 'application/json'} # Only one with 'accept' vs the default header wtf
+    return requests.post(url, headers=headers, files={'file': open(file_path, 'rb')}).json()
 
-def add_file_to_knowledge(file_id, knowledge_id, token=adminToken):
+def add_file_to_knowledge(file_id, knowledge_id):
     url = f'http://localhost:{localHostPort}/api/v1/knowledge/{knowledge_id}/file/add'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
-    data = {'file_id': file_id}
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json={'file_id': file_id}).json()
 
-def chat_with_file(model, prompt, file_id, token=adminToken):
+def chat_with_file(model, prompt, file_id):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
     payload = {
         'model': model,
         'messages': [{'role': 'user', 'content': f"\"{prompt}\""}],
         'files': [{'type': 'file', 'id': file_id}]
     }
-    response = requests.post(url, headers=headers, json=payload)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json=payload).json()
 
-def chat_with_collection(model, context, collection_id, token=adminToken):
+def chat_with_collection(model, context, collection_id):
     url = f'http://localhost:{localHostPort}/api/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
     payload = {
         'model': model,
         'messages': context,
         'files': [{'type': 'collection', 'id': collection_id}]
     }
-    response = requests.post(url, headers=headers, json=payload)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json=payload).json()
 
 def remove_file_from_knowledge(file_id, knowledge_id):
     url = f'http://localhost:{localHostPort}/api/v1/knowledge/{knowledge_id}/file/remove'
-    headers = {
-        'Authorization': f'Bearer {adminToken}',
-        'Content-Type': 'application/json'
-    }
-    data = {'file_id': file_id}
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json={'file_id': file_id}).json()
