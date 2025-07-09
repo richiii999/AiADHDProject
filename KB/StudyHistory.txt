@@ -157,3 +157,34 @@ Over the course of this study session, the student experienced several distracti
 However, some periods of distraction occurred when the topic of study remained relatively constant, with the student struggling to stay focused on a single subject for extended periods. The suggestion to remove unnecessary items from their study space and use visual reminders was made to minimize distractions and stay organized.
 
 The length of study session varied throughout the session, ranging from short intervals with frequent breaks (approx. 30 minutes) to longer intervals without significant breaks (approx. 1 hour).
+START SUMMARY
+The student's focus during this study session lasted for approximately 75 minutes, covering the topic of Organizational Behavior (OB 354). The user was initially focused throughout most of the session and remained engaged and productive until around the 45-minute mark when they started looking away from their notes and began scrolling through social media.
+
+END SUMMARY
+
+Based on the sensor data, the student took the following actions to reduce distraction during this study session:
+
+* **Turn off notifications**: Stopped checking social media, email, and text messages.
+* **Create a quiet space**: Designed a quiet room or area for studying.
+* **Use music wisely**: Listened to calming music that helped with focus, but not too loud to disturb others.
+
+The student also used strategies such as breaking up study sessions into shorter intervals with frequent breaks and removing unnecessary items from their study space to minimize distractions. Additionally, the user practiced self-instruction techniques like "Concentrate" or "Control myself" to motivate themselves during periods of distraction.
+START SUMMARY
+
+The focus of the student over the course of this study session has been inconsistent, with periods of distraction followed by periods of sustained concentration.
+
+END SUMMARY
+
+**Length of Study Session:** 60 minutes
+**Topic of Study:** Organizational Behavior
+**Actions Suggested to Reduce Distraction:**
+
+1. Turn off notifications on phone or put it in silent mode during study sessions.
+2. Use a website blocker to block distracting websites.
+3. Create a conducive environment by designating a quiet, comfortable space for studying.
+
+The student appeared to be more focused than usual, taking regular breaks every 30 minutes to recharge and maintain productivity. They also demonstrated self-regulation techniques such as using the Pomodoro Technique to work in focused 25-minute increments. Additionally, they mentioned getting enough sleep before the study session and staying hydrated throughout it.
+
+However, there were also instances of distraction, particularly when dealing with complex organizational concepts that required sustained concentration. The student may need to revisit these tasks or develop strategies to mitigate distractions associated with learning new information.
+
+END SUMMARY

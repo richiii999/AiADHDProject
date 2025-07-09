@@ -48,8 +48,8 @@ def EndStudySession(): # Writes the response to summaryPrompt into the StudyHist
         f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
     for i in API.KBIDs: API.delete_knowledge(i) # Delete knowledge bases
-    subprocess.Popen("rm ./.open-webui/uploads/*", shell=true)
-    subprocess.Popen("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=true)
+    subprocess.Popen("rm ./.open-webui/uploads/*", shell=True)
+    subprocess.Popen("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=True)
 
 def TTS(text): # Text to speech
     myobj = gTTS(text)
@@ -76,9 +76,7 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification. w
         i = input(inputPrompt)
     return i
 
-AI, CAM = True, True # Quickly change if AI / cams run rather than commenting out
 startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
-
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))]))
 userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
 
@@ -106,14 +104,13 @@ cmds = [ # Commands to run each sensor process
     # 'python ./Sensors/Moondream/main.py'
 ]
 
-if CAM: # Setup virtual cam devices and split original cam input to them
-    print("Starting FFMPEG...")
-    ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
-    time.sleep(2) # Couple sec buffer for ffmpeg to start 
+print("Starting FFMPEG...") # Setup virtual cam devices and split original cam input to them
+ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
+time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 # Sensor processes which record data to be passed to the AI
 print("Starting sensors...")
-sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))] if CAM else [None]
+sensors = [subprocess.Popen(cmds[i].split(), stderr=subprocess.DEVNULL, stdout=logFiles[i], stdin=subprocess.DEVNULL) for i in range(len(cmds))]
 
 KB = [ ### RAG 
     { # Expert knowledge the AI uses to make it's action space
@@ -126,22 +123,22 @@ KB = [ ### RAG
     }
 ]
 
-if AI: ### Initialization of LLM 
-    print("Uploading files to knowledge base...")
-    for i in range(len(KB)): # wtf cant double iterate the list for some reason
-        for file in KB[i].keys(): # NOTE: If you get 'meta' key error vv, reset API keys
-            KB[i][file] = API.upload_file(file)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
-            API.add_file_to_knowledge(KB[i][file], API.KBIDs[i])
-            print(f'Uploaded file: {file} : {KB[i][file]} to knowledge base {API.KBIDs[i]}')
+### Initialization of LLM 
+print("Uploading files to knowledge base...")
+for i in range(len(KB)): # wtf cant double iterate the list for some reason
+    for file in KB[i].keys(): # NOTE: If you get 'meta' key error vv, reset API keys
+        KB[i][file] = API.upload_file(file)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
+        API.add_file_to_knowledge(KB[i][file], API.KBIDs[i])
+        print(f'Uploaded file: {file} : {KB[i][file]} to knowledge base {API.KBIDs[i]}')
 
-    print("Getting action space via RAG...")
-    with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
-        context.append({"role":"user", "content":ReadFileAsLine(f1)})
-        listResponse = API.chat_with_collection(API.Models[modelNum],context, API.KBIDs[0])['choices'][0]['message']['content']
+print("Getting action space via RAG...")
+with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", 'r') as f2: # Set system prompt from file
+    context.append({"role":"user", "content":ReadFileAsLine(f1)})
+    listResponse = API.chat_with_collection(API.Models[modelNum],context, API.KBIDs[0])['choices'][0]['message']['content']
 
-        sysprompt = ReadFileAsLine(f2)
-        sysprompt += listResponse
-        context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
+    sysprompt = ReadFileAsLine(f2)
+    sysprompt += listResponse
+    context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
 
 print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
@@ -156,13 +153,12 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
     # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
-    if AI: 
-        print(PromptAI(sensorData)) # Send sensor data to get list of options
-        print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
+    print(PromptAI(sensorData)) # Send sensor data to get list of options
+    print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
 
     time.sleep(iterDelay)
 
-if AI: EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
+EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
 
 for s in sensors[1:]: s.terminate()
 for f in logFiles: f.close() 
