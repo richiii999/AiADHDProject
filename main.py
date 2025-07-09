@@ -160,7 +160,9 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
 EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
 
-for s in sensors[1:]: s.terminate()
+for s in sensors[1:]:
+    ffmpeg.terminate() # ffmpeg sometimes doesnt terminate, so just spam it 
+    s.terminate()
 for f in logFiles: f.close() 
-ffmpeg.terminate()
+
 print("\nExiting...\n")
