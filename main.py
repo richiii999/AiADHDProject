@@ -21,7 +21,7 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-def PromptAI(prompt) -> str: # Prompt only, uses existing context
+def PromptAI(prompt) -> str: # Prompt only, uses existing crontext
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
     response = API.chat_with_collection(API.Models[modelNum], context, API.KBIDs[1])
@@ -47,8 +47,11 @@ def EndStudySession(): # Writes the response to summaryPrompt into the StudyHist
         f2.truncate(0) # Replace old knowledge with new knowledge
         f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
-    # TODO Delete history and knowledge file # There doesnt seem to be an API to delete files, so the .open-webui/uploads folder will keep growing 
-    API.remove_file_from_knowledge(KB[1]['./KB/Knowledge.txt'], API.KBIDs[1]) # Remove current Knowledge from KB (new one is uploaded on next start)
+    for i in API.KBIDs: API.delete_knowledge(i) # Delete knowledge bases
+    subprocess.Popen("rm ./.open-webui/uploads/*")
+    subprocess.Popen("rm -r `ls | grep -v 'chroma.sqlite3'")
+
+
 
 def TTS(text): # Text to speech
     myobj = gTTS(text)

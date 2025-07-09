@@ -17,20 +17,13 @@ Models = [
 # Thanks to https://github.com/open-webui/open-webui/discussions/11761
 def create_knowledge(name:str, description:str, data:dict={}, access_control:dict={}, token=adminToken):
     url=f"http://localhost:{localHostPort}/api/v1/knowledge/create"
-    headers = {
-                'Authorization': f'Bearer {token}',
-                'Content-Type': 'application/json',
-                'data': f"name: '{name}',description: '{description}'"
-    }
     payload = {
-    "name": f"{name}",
-    "description": f'{description}',
-    "data": data,
-    "access_control": access_control
+        "name": f"{name}",
+        "description": f'{description}',
+        "data": data,
+        "access_control": access_control
     }
-    
-    response = requests.post(url, headers=defaultHeader, json=payload)
-    return response.json()
+    return requests.post(url, headers=defaultHeader, json=payload).json()
 
 def delete_knowledge(kbid:str):
     url=f"http://localhost:{localHostPort}/api/v1/knowledge/{kbid}/delete"
@@ -41,7 +34,6 @@ KBIDs = [ # TODO change to dict perhaps
     create_knowledge('Expert', 'asdf')['id'], 
     create_knowledge('Study', 'asdf')['id']
 ]
-print(KBIDs)
 
 ### API
 def chat_with_model(model, context):
