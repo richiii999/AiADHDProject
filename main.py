@@ -48,10 +48,8 @@ def EndStudySession(): # Writes the response to summaryPrompt into the StudyHist
         f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
     for i in API.KBIDs: API.delete_knowledge(i) # Delete knowledge bases
-    subprocess.Popen("rm ./.open-webui/uploads/*")
-    subprocess.Popen("rm -r `ls | grep -v 'chroma.sqlite3'")
-
-
+    subprocess.Popen("rm ./.open-webui/uploads/*", shell=true)
+    subprocess.Popen("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=true)
 
 def TTS(text): # Text to speech
     myobj = gTTS(text)
