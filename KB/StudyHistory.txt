@@ -221,3 +221,20 @@ Actions suggested to reduce distraction:
 Sensor data shows that the student was focused for most of the study session, with no instances of distraction reported. The user seemed focused throughout the entire session, with some instances where they were even more focused.
 
 END SUMMARY
+**START SUMMARY**
+
+Based on the aggregated sensor data, the student's focus during this study session varied from approximately 23 minutes to 38 minutes.
+
+The user seemed focused throughout most of the study session, with no significant drops in attention. However, there was a brief period at approximately 38 minutes when the student appeared slightly distracted, with a slight decrease in focus.
+
+The user's overall level of focus remained consistent, indicating that they were able to maintain their concentration for an extended period without any major distractions or breaks.
+
+**END SUMMARY**
+
+**Sensor Data:**
+
+* Time = 23 minutes, Aggregated Sensor data:
+The user seems focused
+The user seems focused
+
+Note: There are no significant distractions or breaks during this study session.

@@ -5,5 +5,3 @@ __pycache__/
 .venv/
 uv.lock
 pyproject.toml
-
-Sensors/PythonGazeTracker/gaze_tracking/trained_models/shape_predictor_68_face_landmarks.dat
