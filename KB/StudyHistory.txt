@@ -238,3 +238,36 @@ The user seems focused
 The user seems focused
 
 Note: There are no significant distractions or breaks during this study session.
+START SUMMARY
+
+Based on the sensor data provided, here is a summary of the student's focus over the course of this study session:
+
+**Length of Study Session:** Approximately 75 minutes.
+
+The topic of study is algebraic expressions, which was mentioned in the context.
+
+The student was initially focused and engaged for most of the first 45 minutes. However, around the 45-minute mark, they began to lose focus due to distraction caused by a passage on algebraic expressions. This brief distraction lasted approximately 5 minutes.
+
+**Actions Suggested to Reduce Distraction:** The student took the following actions to minimize distractions:
+
+1. Turn off notifications on phone or put it in silent mode during study sessions.
+2. Use a website blocker to block distracting websites.
+3. Create a conducive environment by designating a quiet, comfortable space for studying.
+
+The student's focus improved over time, with no further significant distractions detected during the remainder of the study session.
+
+END SUMMARY
+START SUMMARY
+
+The student has been studying Organizational Behavior (OB 354) topics during this study session, which started approximately 28 minutes ago.
+
+Based on the sensor data, the student's focus has been inconsistent, with periods of distraction and refocusing. At one point, the user seemed distracted (FaceTracker), but their gaze suggested they were focused (GazeTracker). However, the user was able to take a time out and refocus.
+
+The suggested actions to reduce distractions included:
+
+* Practice self-regulation techniques
+* Develop a conducive study environment
+* Monitor progress and adjust approach as needed
+* Consider additional strategies
+
+END SUMMARY
