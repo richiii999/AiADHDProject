@@ -147,8 +147,14 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
 
     # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
 
-    print(PromptAI(sensorData)) # Send sensor data to get list of options
-    print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
+    # Prompt the AI WITHOUT CONTEXT and only sensors data for a 'yes' or 'no' response. Then only on 'yes' continue
+    inp = "Based on the following sensor data, is the user in anyway not focused? 'yes' or 'no' only\n" + sensorData
+    resp = API.chat_with_model(API.Models[modelNum], [{"role":"user", "content":sanitize(inp)}])['choices'][0]['message']['content'].lower()
+    print("Distraction detection = " + resp)
+    if resp == 'no': print("Not distracted, No action taken")
+    else:
+        print(PromptAI(sensorData)) # Send sensor data to get list of options
+        print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
 
     time.sleep(iterDelay)
 
