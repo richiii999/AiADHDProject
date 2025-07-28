@@ -271,3 +271,47 @@ The suggested actions to reduce distractions included:
 * Consider additional strategies
 
 END SUMMARY
+START SUMMARY
+
+The student's focus during this study session can be summarized as follows:
+
+* Length of study session: Not specified
+* Topic of study: Not specified (but assumed to be within the knowledge base)
+* Focus: The student demonstrated inconsistent focus, with brief periods of distraction lasting around 5 minutes, which caused them to lose focus on their notes and calculations. However, they were able to improve their focus over time, with no further significant distractions detected during the remainder of the study session.
+
+END SUMMARY
+START SUMMARY
+
+The study session lasted for a total of 247 minutes. The topic of study is not specified in the provided context.
+
+Based on the aggregated sensor data, the student's focus can be summarized as follows:
+
+* Initially (0-27 minutes), the student seemed to be experiencing some inconsistencies in their focus, with the face tracker indicating distraction and the gaze tracker suggesting focus.
+* During a 30-minute break (27-57 minutes), the student took a break to recharge.
+* After the break ended (57-247 minutes), the student's face tracker suggested they seemed focused, but their gaze tracker indicated that they might be zoning out.
+
+Throughout the study session, the following actions were suggested to reduce distraction:
+
+* Taking a brief break to stretch and move around
+* Re-establishing consistency in the study routine
+* Minimizing distractions by turning off electronic devices and removing unnecessary items from the study area
+* Practicing self-regulation techniques like deep breathing or visualization
+* Taking short breaks every 30-60 minutes
+
+END SUMMARY
+START SUMMARY
+
+The study session lasted for 37 minutes, during which the topic of study was algebraic expressions.
+
+Initially, the user seemed distracted according to the face tracker sensor data. However, no specific reasons for this distraction were provided.
+
+To help reduce distractions, I suggested the following actions:
+
+1. **STOP**: Use visual, sound, or tactile signals to remind myself to pause what Im doing and consider my behavior or concentration.
+2. **Use coloured tape** on my pencil or watch strap to remind me to stop and focus.
+3. **Take breaks**: Allow myself time outs during lessons to move, do breathing exercises, or relax to de-stress.
+4. **Think ahead**: Plan out my study sessions in advance to minimize distractions.
+
+You chose the action **Use coloured tape** on your pencil or watch strap to remind yourself to stop and focus!
+
+END SUMMARY

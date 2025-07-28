@@ -6,6 +6,7 @@
     # delete all uv-related files and folders (.venv, uv.lock, pyproject.toml, .python-version)
     # deactivate, then uv-init, uv python pin 3.11.13, uv add -r requirements.txt
 # Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
+# activate venv (bruh how did I forget)
 # DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
 # sudo modprobe v4l2loopback video_nr=8,9 # Add video8/9 devices
     # v4l2-ctl --list-devices # Verify devices have appeared correctly
@@ -76,6 +77,21 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification. w
         i = input(inputPrompt)
     return i
 
+def Sense() -> str: # Gather output from the sensors
+    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
+    for f in procs.values(): # Get most recent output per sensor 
+        f.seek(0)
+        sensorData += f.readlines()[-1]
+
+    # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
+
+    return sensorData
+
+def DistractionDetection(sensorData) -> str: # Prompt the AI WITHOUT CONTEXT for a 'yes' or 'no' response
+    inp = "Based on the following sensor data, is the user in anyway not focused? 'yes' or 'no' only\n" + sensorData
+    resp = API.chat_with_model(API.Models[modelNum], [{"role":"user", "content":sanitize(inp)}])['choices'][0]['message']['content'].lower().replace('.','')
+    return resp
+
 startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))]))
 userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
@@ -105,7 +121,6 @@ for f in procs.values():
 # Sensor processes which record data to be passed to the AI
 print("Starting sensors...")
 sensors = [subprocess.Popen(path.split(), stderr=subprocess.DEVNULL, stdout=log, stdin=subprocess.DEVNULL) for path,log in procs.items()]
-
 KB = [ ### RAG 
     { # Expert knowledge the AI uses to make it's action space
         './KB/ADHD2.pdf':'', # ADHD Information 1, Some strats
@@ -137,27 +152,16 @@ with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", '
 print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
 
-# TODO: automatic prompt (vs timer prompt), have a bkg (no context) prompt, then only if 'yes' respond, do main prompt, else continue loop (20s between)
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
-    sensorData = f"Time = {int(time.time() - startTime)} minutes, Aggregated Sensor data:\n"
-    for f in procs.values(): # Get most recent output per sensor 
-        f.seek(0)
-        sensorData += f.readlines()[-1]
+    sensorData = Sense()
     print(sensorData)
 
-    # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
-
-    # Prompt the AI WITHOUT CONTEXT and only sensors data for a 'yes' or 'no' response. Then only on 'yes' continue
-    inp = "Based on the following sensor data, is the user in anyway not focused? 'yes' or 'no' only\n" + sensorData
-    resp = API.chat_with_model(API.Models[modelNum], [{"role":"user", "content":sanitize(inp)}])['choices'][0]['message']['content'].lower()
-    print("Distraction detection = " + resp)
-    if resp == 'no': print("Not distracted, No action taken")
+    if DistractionDetection(sensorData) == 'no': print("Not distracted, No action taken")
     else:
         print(PromptAI(sensorData)) # Send sensor data to get list of options
         print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
-
+        
     time.sleep(iterDelay)
-
 EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
 
 for s in sensors[1:]:

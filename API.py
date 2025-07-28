@@ -6,7 +6,7 @@ import requests
 
 ### Open-WebUI Settings
 localHostPort = "8080"
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1MTJhMjRjLTQ5YmMtNDFkYS1hMDQ2LTQ1MzFjNGQ1MGY1OSJ9.hS94_5e9x9G8sVmZbqmS2WFX7iB09ylCHWkbOI5bQu4'
+adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJjOTM2OTE0LWRkZmQtNGFkNS05NjUyLTNmNmZmM2E3M2QwOCJ9.xXM3p3kMsgs0W6ac9u7c3G6t7LReBXI0P7K6h5NesU0'
 defaultHeader = {'Authorization':f'Bearer {adminToken}','Content-Type':'application/json'}
 Models = [
     "justinrahb.claude-3-7-sonnet-20250219",
