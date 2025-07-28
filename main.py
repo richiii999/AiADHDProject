@@ -2,19 +2,10 @@
 # Manages the sensors via subprocesses and prompts the LLM via the webui API
 
 ### SETUP: Must be done before running (on separate terminals / in background)
-# reset packages / uv / venv:
-    # delete all uv-related files and folders (.venv, uv.lock, pyproject.toml, .python-version)
-    # deactivate, then uv-init, uv python pin 3.11.13, uv add -r requirements.txt
-# Get the shape_predictor... file from GDrive and put it in (mkdir) ./Sensors/PythonGazeTracker/gaze_tracking/trained_models/
-# activate venv (bruh how did I forget)
 # DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
 # sudo modprobe v4l2loopback video_nr=8,9 # Add video8/9 devices
     # v4l2-ctl --list-devices # Verify devices have appeared correctly
     # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
-# Connect Claude to openwebui: https://openwebui.com/f/justinrahb/anthropic
-    # Download, then import from file on http://localhost:8080/admin/functions, 
-    # remove the top / bottom html stuff. Also delete extra models if not needed
-    # Once imported, click the gear 'valves' and insert the API key, turn it on
 
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)

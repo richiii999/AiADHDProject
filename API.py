@@ -2,6 +2,11 @@
 # From https://docs.openwebui.com/getting-started/api-endpoints
 # Modified the calls to make sure it's formatted correctly
 
+# Connect Claude to openwebui: https://openwebui.com/f/justinrahb/anthropic
+    # Download, then import from file on http://localhost:8080/admin/functions, 
+    # remove the top / bottom html stuff. Also delete extra models if not needed
+    # Once imported, click the gear 'valves' and insert the API key, turn it on
+
 import requests
 
 ### Open-WebUI Settings

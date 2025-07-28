@@ -9,3 +9,4 @@ pyproject.toml
 
 # Local instance of webui
 .open-webui/
+.webui_secret_key
