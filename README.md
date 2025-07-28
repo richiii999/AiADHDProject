@@ -27,7 +27,9 @@ FOCUS is designed to be a modular framework, where each component (see diagram) 
 
 We implemented FOCUS using OpenWebUI, an agentic AI platform for model serving and tool integration. OpenCV was used for face and gaze tracking via webcam input, and a local Visual Language Model (VLM) identified the content read by the learner. Prompts and retrieval-augmented generation (RAG) provided relevant context to one of a variety of reasoning model(s) tailored to learners’ cost and accuracy needs. The chosen reasoning model also summarizes each study session and maintains a long-term learner profile. While further testing with a cohort of ADHD students is planned (RQ3), initial results show that FOCUS effectively learned simulated learning patterns and increasingly suggested more effective actions over repeated sessions.
 
-**FOCUS Workflow** (todo image)
+**FOCUS Workflow**
+<img width="968" height="625" alt="image" src="https://github.com/user-attachments/assets/a12a76b2-ec84-4fc4-ab93-950884081ab9" />
+
 
 **References** (Zotero Library)
 
