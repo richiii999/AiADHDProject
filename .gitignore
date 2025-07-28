@@ -1,6 +1,11 @@
+# Python
 __pycache__/
-.open-webui/
-.vscode/
 .venv/
 uv.lock
 pyproject.toml
+
+# Local stuff
+.vscode/
+
+# Local instance of webui
+.open-webui/
