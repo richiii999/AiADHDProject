@@ -1,5 +1,5 @@
 __pycache__/
-.open-webui/cache/
+.open-webui/
 .vscode/
 .venv/
 uv.lock
