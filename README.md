@@ -31,9 +31,8 @@ We implemented FOCUS using OpenWebUI, an agentic AI platform for model serving a
 <img width="968" height="625" alt="image" src="https://github.com/user-attachments/assets/a12a76b2-ec84-4fc4-ab93-950884081ab9" />
 
 
-**References** (Zotero Library)
-
-**Project Code** (Github Repo)
+**References** (Zotero Library, Github Repo)
+<img width="324" height="140" alt="image" src="https://github.com/user-attachments/assets/af37db02-b662-4f0a-a65d-473c8020433e" />
 
 **Requirements**
 - Python 3.x
