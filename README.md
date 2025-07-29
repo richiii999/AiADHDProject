@@ -22,18 +22,18 @@
    ```
    To get your admin token, login / create an acc (dont need to use real email, this is local).
 
-   Navigate to: profile (bottom left) > Settings > Account > API Keys "show" > JWT Token "copy"
+   Navigate to: Profile (bottom left) > Settings > Account > API Keys "show" > JWT Token "copy"
 
    Enter this when requested, or create / edit the file .webui_admin_key and paste it in
 5. If using camera, setup camera output devices & verify they work
-   Output of 2nd command should show:
-   "Dummy video device (0x0000) (platform:v4l2loopback-000): /dev/video8 ..."
+
+   Output of 2nd command should show "Dummy video device (0x0000) (platform:v4l2loopback-000): /dev/video8 ..."
    ```
    sudo modprobe v4l2loopback video_nr=8,9 # if you already have device 8/9, use other nums
    v4l2-ctl --list-devices # Verify devices have appeared correctly
    sudo modprobe -r v4l2loopback # Remove if it didnt work / want to change stuff
    ```
-6. Start FOCUS
+7. Start FOCUS
    ```
    python main.py
    ```
