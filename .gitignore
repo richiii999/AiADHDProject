@@ -1,8 +1,9 @@
-# Python
+# Python / uv
 __pycache__/
 .venv/
 uv.lock
 pyproject.toml
+.python-version
 
 # Local stuff
 .vscode/
