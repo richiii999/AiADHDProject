@@ -2,6 +2,7 @@
 
 <img width="1803" height="1436" alt="image" src="https://github.com/user-attachments/assets/8f1c171e-f154-495f-a787-d632e45876a2" />
 
+
 **Installation & Usage**
 1. Clone the repo
    ```
