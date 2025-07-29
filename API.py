@@ -2,16 +2,20 @@
 # From https://docs.openwebui.com/getting-started/api-endpoints
 # Modified the calls to make sure it's formatted correctly
 
-# Connect Claude to openwebui: https://openwebui.com/f/justinrahb/anthropic
-    # Download, then import from file on http://localhost:8080/admin/functions, 
-    # remove the top / bottom html stuff. Also delete extra models if not needed
-    # Once imported, click the gear 'valves' and insert the API key, turn it on
-
 import requests
 
 ### Open-WebUI Settings
+adminToken = ''
+with open('.webui_admin_key', 'a') as f: pass # Create file if it doesnt exist (write only bruh)
+with open('.webui_admin_key', 'r+') as f: # Re-open in read/write mode
+    if not f.readline(): # if file is empty
+        f.seek(0)
+        while adminToken == '': adminToken = input("Paste admin token (Profile > Settings > Account > API Keys > JWT Token):")
+        f.write(adminToken) # adminToken is now saved for later use
+    f.seek(0)
+    adminToken = f.readline()
+
 localHostPort = "8080"
-adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJjOTM2OTE0LWRkZmQtNGFkNS05NjUyLTNmNmZmM2E3M2QwOCJ9.xXM3p3kMsgs0W6ac9u7c3G6t7LReBXI0P7K6h5NesU0'
 defaultHeader = {'Authorization':f'Bearer {adminToken}','Content-Type':'application/json'}
 Models = [
     "justinrahb.claude-3-7-sonnet-20250219",

@@ -1,11 +1,4 @@
 # main.py
-# Manages the sensors via subprocesses and prompts the LLM via the webui API
-
-### SETUP: Must be done before running (on separate terminals / in background)
-# DATA_DIR=./.open-webui uvx --python 3.11 open-webui@latest serve # Start open-webui server
-# sudo modprobe v4l2loopback video_nr=8,9 # Add video8/9 devices
-    # v4l2-ctl --list-devices # Verify devices have appeared correctly
-    # sudo modprobe -r v4l2loopback # Remove mod if it didnt work / want to change stuff
 
 import sys
 import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
@@ -144,6 +137,8 @@ print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
 
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
+# todo 'q' to quit
+# also todo model auto populate the list
     sensorData = Sense()
     print(sensorData)
 

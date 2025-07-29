@@ -8,7 +8,7 @@
    git clone https://github.com/richiii999/AiADHDProject
    cd AiADHDProject/
    ```
-2. Setup virtual environment with dependencies with uv
+2. Setup virtual environment and dependencies with uv
    ```
    uv init
    uv python pin 3.11.13
