@@ -11,6 +11,7 @@
    ```
 2. Setup virtual environment and dependencies with uv
    ```
+   pip install uv   #If you don't have UV installed in your system
    uv init
    uv python pin 3.11.13
    uv add -r requirements.txt
