@@ -27,7 +27,7 @@
    Navigate to: Profile (bottom left) > Settings > Account > API Keys "show" > JWT Token "copy"
 
    Enter this when requested, or create / edit the file .webui_admin_key and paste it in
-5. If using camera, setup camera output devices & verify they work
+4. If using camera, setup camera output devices & verify they work
 
    Output of 2nd command should show "Dummy video device (0x0000) (platform:v4l2loopback-000): /dev/video8 ..."
    ```
@@ -35,12 +35,18 @@
    v4l2-ctl --list-devices # Verify devices have appeared correctly
    sudo modprobe -r v4l2loopback # Remove if it didnt work / want to change stuff
    ```
-7. Start FOCUS
+5. Setup AI models: See the bottom section on setting up models to use with FOCUS
+6. Start FOCUS
    ```
    python main.py
    ```
 
-To enable cloud-based models, go to OpenWebUI (default http://localhost:8080/) and do the following:
+**Setting up models**
+Local Models: install ollama to run local models via OpenWebUI
+- Manual: curl -fsSL https://ollama.com/install.sh | sh
+- Ubuntu (snap): snap install ollama
+
+Cloud-based Models: go to OpenWebUI (default http://localhost:8080/) and do the following:
 - OpenAI Models: Profile > Admin Panel > Settings > Connections > "Manage OpenAI API Connections" set to ON,
    - Add the endpoint (ex. "https://api.openai.com/v1") and enter your API Key
 - Claude: Download this function: https://openwebui.com/f/justinrahb/anthropic
