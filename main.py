@@ -6,7 +6,7 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-def PromptAI(prompt) -> str: # Prompt only, uses existing crontext
+def PromptAI(prompt) -> str: # Prompt only, uses existing context
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
     response = API.chat_with_collection(API.Models[modelNum], context, API.KBIDs[1])
@@ -53,7 +53,7 @@ def sanitize(s) -> str: # Remove characters that cause issues from a str
     s = s.replace("\"", "")
     return s
 
-def UserInput(inputPrompt, validinput=None) -> str: # User input verification. whenever 'q' by itself quits the main loop '' re-prompts, etc.
+def UserInput(inputPrompt, validinput=None) -> str: # User input verification
     i = input(inputPrompt)
     while i not in validinput:
         print("Invalid input, try again")
