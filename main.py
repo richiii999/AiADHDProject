@@ -6,7 +6,7 @@ import time
 
 import API # ./API.py: Contains API calls to webui
 
-def PromptAI(prompt) -> str: # Prompt only, uses existing context
+def PromptAI(prompt) -> str: # Prompt only, uses existing crontext
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
     response = API.chat_with_collection(API.Models[modelNum], context, API.KBIDs[1])
@@ -33,8 +33,8 @@ def EndStudySession(): # Writes the response to summaryPrompt into the StudyHist
         f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
     for i in API.KBIDs: API.delete_knowledge(i) # Delete knowledge bases
-    subprocess.Popen("rm ./.open-webui/uploads/*", shell=True)
-    subprocess.Popen("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=True)
+    subprocess.run("rm ./.open-webui/uploads/*", shell=True)
+    subprocess.run("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=True)
 
 def TTS(text): # Text to speech
     myobj = gTTS(text)
@@ -53,7 +53,7 @@ def sanitize(s) -> str: # Remove characters that cause issues from a str
     s = s.replace("\"", "")
     return s
 
-def UserInput(inputPrompt, validinput=None) -> str: # User input verification. 
+def UserInput(inputPrompt, validinput=None) -> str: # User input verification. whenever 'q' by itself quits the main loop '' re-prompts, etc.
     i = input(inputPrompt)
     while i not in validinput:
         print("Invalid input, try again")
@@ -77,7 +77,10 @@ def DistractionDetection(sensorData) -> str: # Prompt the AI WITHOUT CONTEXT for
     return resp
 
 startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
+
+API.Models += subprocess.check_output("ollama list | grep -v NAME | awk '{print $1}'", shell=True).decode('utf-8').split('\n')[:-1] # Get the list of models from ollama (formatting to remove the col names)
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i, val) for i, val in (enumerate(API.Models))]) + "\n>", [str(i) for i in range(len(API.Models))]))
+
 userStudyTopic = input("What is your study topic? (Helps the AI use the provided files)\n>")
 
 AUDIO = UserInput("Would you like Audio? (y/N)\n>", ['y','n',''])
