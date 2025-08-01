@@ -45,6 +45,7 @@
 Local Models: install ollama to run local models via OpenWebUI
 - Manual: curl -fsSL https://ollama.com/install.sh | sh
 - Ubuntu (snap): snap install ollama
+To download models, run ollama pull <model>. FOCUS was tested with llama3.2:1b and llama3.2:8b
 
 Cloud-based Models: go to OpenWebUI (default http://localhost:8080/) and do the following:
 - OpenAI Models: Profile > Admin Panel > Settings > Connections > "Manage OpenAI API Connections" set to ON,
