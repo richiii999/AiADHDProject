@@ -18,19 +18,30 @@ def PromptAI(prompt) -> str:
     return response
 
 def EndStudySession(): # Writes the response to summaryPrompt into the StudyHistory.txt file
-    print('\nEnding study session...\n')
+    print('\nEnding study session...')
 
-    with open('./KB/StudyHistory.txt', 'a') as f1, open('./LLM/SummaryPrompt.txt', 'r') as p: f1.write('\n' + PromptAI(ReadFileAsLine(p))) # Prompt Summary, append it to history file
+    print('Stopping sensors...')
+    ffmpeg.terminate() # ffmpeg sometimes doesnt terminate, so just spam it 
+    for s in sensors[1:]: s.terminate()
+    for f in procs.values(): f.close() 
+
+    with open('./KB/StudyHistory.txt', 'a') as f1, open('./LLM/SummaryPrompt.txt', 'r') as p: 
+        print('Generating Summary...')
+        f1.write('\n' + PromptAI(ReadFileAsLine(p))) # Prompt Summary, append it to history file
     with open('./KB/StudyHistory.txt', 'r') as f1, open('./KB/Knowledge.txt', 'w') as f2, open('./LLM/KnowledgePrompt.txt', 'r') as p:
         global context
         context = [] # reset the context
 
         f2.truncate(0) # Replace old knowledge with new knowledge
+        print('Generating Knowledge...')
         f2.write(PromptAI(ReadFileAsLine(p) + ReadFileAsLine(f1)))
 
+    print('Clearing old knowledge base files...')
     for i in API.KBIDs: API.delete_knowledge(i) # Delete knowledge bases
     subprocess.run("rm ./.open-webui/uploads/*", shell=True)
     subprocess.run("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=True)
+
+    print("\nExiting...\n")
 
 def TTS(text):
     myobj = gTTS(text)
@@ -68,8 +79,8 @@ def DistractionDetection(sensorData) -> str: # Prompt the AI WITHOUT CONTEXT for
     resp = API.chat_with_model(API.Models[modelNum], [{"role":"user", "content":sanitize(inp)}])['choices'][0]['message']['content'].lower().replace('.','')
     return resp
 
-### Initialization
-print("Welcome to...") # Title screen
+
+print("Welcome to...") ### Initialization
 time.sleep(1)
 print("       ___           ___           ___           ___           ___                   ")
 print("      /\\__\\         /\\  \\         /\\__\\         /\\  \\         /\\__\\        ")
@@ -98,8 +109,7 @@ if AUDIO == 'y':
 
 context = [] # The chat history for the AI, needs to be passed each time per chat
 
-### Sensors & Subprocesses
-print("Starting FFMPEG...") # Setup virtual cam devices and split original cam input to them
+print("Starting FFMPEG...") ### Sensors & Subprocesses # Setup virtual cam devices and split original cam input to them
 ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video8 -f v4l2 -vcodec rawvideo -s 640x360 /dev/video9 -loglevel quiet'.split(), stdin=subprocess.DEVNULL)
 time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
@@ -125,9 +135,8 @@ KB = [ ### RAG
     }
 ]
 
-### Initialization of LLM 
-print("Uploading files to knowledge base...")
-for i in range(len(KB)): # wtf cant double iterate the list for some reason
+print("Uploading files to knowledge base...") ### Initialization of LLM
+for i in range(len(KB)): # NOTE: wtf cant double iterate the list for some reason
     for file in KB[i].keys(): # NOTE: If you get 'meta' key error vv, reset API keys
         KB[i][file] = API.upload_file(file)['meta']['collection_name'][5:] # TODO ID is directly availible in another part of the dict without string slicing
         API.add_file_to_knowledge(KB[i][file], API.KBIDs[i])
@@ -142,25 +151,23 @@ with open('./LLM/GenerateActions.txt', 'r') as f1, open("./LLM/SysPrompt.txt", '
     sysprompt += listResponse
     context = [{"role":"system", "content":sanitize(sysprompt)}] # The system prompt now contains the contents of sysprompt.txt appended with the list response
 
-print("Starting Study Session...") ### Intro
-time.sleep(initDelay) # give servers & sensors time to start up
+try: ### Main loop
+    print("Starting Study Session (CTRL-C or 'q' on input to end study)...") 
+    time.sleep(initDelay) # give servers & sensors time to start up
 
-while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
-    sensorData = Sense()
-    print(sensorData)
+    userInput = ''
+    while True: 
+        sensorData = Sense()
+        print(sensorData)
 
-    if DistractionDetection(sensorData) == 'no': print("Not distracted, No action taken")
-    else:
-        print(PromptAI(sensorData)) # Send sensor data to get list of options
-        print(PromptAI(input('\n>'))) # Have the user respond to the AI, picking a choice
-        
-    time.sleep(iterDelay)
-EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
+        if DistractionDetection(sensorData) == 'no': print("Not distracted, No action taken")
+        else:
+            print(PromptAI(sensorData)) # Send sensor data to get list of options
+            userInput = input('\n>')
+            if userInput == 'q': break
+            print(PromptAI(userInput)) # Have the user respond to the AI, picking a choice
+            
+        time.sleep(iterDelay)
 
-ffmpeg.terminate() # ffmpeg sometimes doesnt terminate, so just spam it 
-for s in sensors[1:]: s.terminate()
-for f in procs.values(): f.close() 
-
-print("\nExiting...\n")
-
-# todo 'q' to quit
+except KeyboardInterrupt: pass
+finally: EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
