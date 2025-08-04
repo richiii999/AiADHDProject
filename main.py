@@ -1,30 +1,26 @@
 # main.py
 
 import sys
-import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 import time
+import subprocess # manages subprocess I/O (ollama / webui servers, sensors, and ffmpeg)
 
 import API # ./API.py: Contains API calls to webui
 
-def PromptAI(prompt) -> str: # Prompt only, uses existing context
+def PromptAI(prompt) -> str:
     global context
     context.append({"role":"user", "content":sanitize(prompt)})
     response = API.chat_with_collection(API.Models[modelNum], context, API.KBIDs[1])
 
-    try: # try-except to print the error if it fails (usually 'model not found')
-        response = response['choices'][0]['message']['content']
-        if AUDIO: TTS(response)
+    response = response['choices'][0]['message']['content']
+    context.append({"role":"assistant", "content":sanitize(response)})
 
-        context.append({"role":"assistant", "content":sanitize(response)})
-        return response
-    except: print(response)
+    if AUDIO: TTS(response)
+    return response
 
 def EndStudySession(): # Writes the response to summaryPrompt into the StudyHistory.txt file
     print('\nEnding study session...\n')
 
-    with open('./KB/StudyHistory.txt', 'a') as f1, open('./LLM/SummaryPrompt.txt', 'r') as p: 
-        f1.write('\n' + PromptAI(ReadFileAsLine(p))) # Prompt Summary, append it to history file
-
+    with open('./KB/StudyHistory.txt', 'a') as f1, open('./LLM/SummaryPrompt.txt', 'r') as p: f1.write('\n' + PromptAI(ReadFileAsLine(p))) # Prompt Summary, append it to history file
     with open('./KB/StudyHistory.txt', 'r') as f1, open('./KB/Knowledge.txt', 'w') as f2, open('./LLM/KnowledgePrompt.txt', 'r') as p:
         global context
         context = [] # reset the context
@@ -36,14 +32,14 @@ def EndStudySession(): # Writes the response to summaryPrompt into the StudyHist
     subprocess.run("rm ./.open-webui/uploads/*", shell=True)
     subprocess.run("cd ./.open-webui/vector_db && rm -r `ls | grep -v 'chroma.sqlite3'`", shell=True)
 
-def TTS(text): # Text to speech
+def TTS(text):
     myobj = gTTS(text)
     myobj.save("response.mp3")
-    pygame.mixer.init()
-    pygame.mixer.music.load("response.mp3")
-    pygame.mixer.music.play()
+    mixer.init()
+    mixer.music.load("response.mp3")
+    mixer.music.play()
 
-def ReadFileAsLine(f) -> str: # Read a file as a str (multi-line)
+def ReadFileAsLine(f) -> str:
     s = ''
     for line in f.readlines(): s += sanitize(line).replace('\n',' ')
     return s
@@ -57,7 +53,6 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification
     i = input(inputPrompt)
     while i not in validinput:
         print("Invalid input, try again")
-        time.sleep(1)
         i = input(inputPrompt)
     return i
 
@@ -66,15 +61,28 @@ def Sense() -> str: # Gather output from the sensors
     for f in procs.values(): # Get most recent output per sensor 
         f.seek(0)
         sensorData += f.readlines()[-1]
-
-    # subprocess.run(f'rm ./KB/ss.png; scrot -a 0,0,2560,1440 ./KB/ss.png', shell=True) # Take a ss for moondream
-
     return sensorData
 
 def DistractionDetection(sensorData) -> str: # Prompt the AI WITHOUT CONTEXT for a 'yes' or 'no' response
     inp = "Based on the following sensor data, is the user in anyway not focused? 'yes' or 'no' only\n" + sensorData
     resp = API.chat_with_model(API.Models[modelNum], [{"role":"user", "content":sanitize(inp)}])['choices'][0]['message']['content'].lower().replace('.','')
     return resp
+
+### Initialization
+print("Welcome to...") # Title screen
+time.sleep(1)
+print("       ___           ___           ___           ___           ___                   ")
+print("      /\\__\\         /\\  \\         /\\__\\         /\\  \\         /\\__\\        ")
+print("     /:/ _/_       /::\\  \\       /:/  /         \\:\\  \\       /:/ _/_            ")
+print("    /:/ /\\__\\     /:/\\:\\  \\     /:/  /           \\:\\  \\     /:/ /\\  \\      ")
+print("   /:/ /:/  /    /:/  \\:\\  \\   /:/  /  ___   ___  \\:\\  \\   /:/ /::\\  \\       ")
+print("  /:/_/:/  /    /:/__/ \\:\\__\\ /:/__/  /\\__\\ /\\  \\  \\:\\__\\ /:/_/:/\\:\\__\\ ")
+print("  \\:\\/:/  /     \\:\\  \\ /:/  / \\:\\  \\ /:/  / \\:\\  \\ /:/  / \\:\\/:/ /:/  / ")
+print("   \\::/__/       \\:\\  /:/  /   \\:\\  /:/  /   \\:\\  /:/  /   \\::/ /:/  /       ")
+print("    \\:\\  \\        \\:\\/:/  /     \\:\\/:/  /     \\:\\/:/  /     \\/_/:/  /      ")
+print("     \\:\\__\\        \\::/  /       \\::/  /       \\::/  /        /:/  /           ")
+print("      \\/__/         \\/__/         \\/__/         \\/__/         \\/__/         \n\n")
+time.sleep(1)
 
 startTime, initDelay, iterDelay = time.time(), 3, 5 # Timing delays
 
@@ -85,8 +93,8 @@ userStudyTopic = input("What is your study topic? (Helps the AI use the provided
 
 AUDIO = UserInput("Would you like Audio? (y/N)\n>", ['y','n',''])
 if AUDIO == 'y':
-    from gtts import gTTS
-    import pygame
+    from gtts import gTTS # TTS
+    from pygame import mixer # Audio
 
 context = [] # The chat history for the AI, needs to be passed each time per chat
 
@@ -96,26 +104,24 @@ ffmpeg = subprocess.Popen('ffmpeg  -i /dev/video0 -f v4l2 -vcodec rawvideo -s 64
 time.sleep(2) # Couple sec buffer for ffmpeg to start 
 
 procs = { # {path : Log file}, sensor output is periodically read from here and given to the AI
-    'python ./Sensors/PythonFaceTracker/main.py' : open('./Logs/faceTracker.txt', 'r+'),
+    'python ./Sensors/PythonFaceTracker/main.py'    : open('./Logs/faceTracker.txt', 'r+'),
     'python ./Sensors/PythonGazeTracker/example.py' : open('./Logs/gazeTracker.txt', 'r+')
-    # 'python ./Sensors/Moondream/main.py' : open('./Logs/VLM.txt', 'r+')
 }
 
 for f in procs.values(): 
     f.truncate(0) # Empty old logs
     f.write('The user seems focused\n') # Placeholder first log entry
 
-# Sensor processes which record data to be passed to the AI
-print("Starting sensors...")
+print("Starting sensors...") # Sensor processes which record data to be passed to the AI
 sensors = [subprocess.Popen(path.split(), stderr=subprocess.DEVNULL, stdout=log, stdin=subprocess.DEVNULL) for path,log in procs.items()]
 KB = [ ### RAG 
     { # Expert knowledge the AI uses to make it's action space
-        './KB/ADHD2.pdf':'', # ADHD Information 1, Some strats
-        './KB/TeachingADHD.pdf':'' # ADHD Information 2, Good strats like quizzes and summaries
+        './KB/ADHD2.pdf'       :'', # ADHD Information 1, Some strats
+        './KB/TeachingADHD.pdf':''  # ADHD Information 2, Good strats like quizzes and summaries
     },
     { # Users study material
         './KB/Knowledge.txt':'', # 'Knowledge' gained by AI after analyzing summaries. # MUST BE FIRST
-        './KB/OB_CH13.pptx':'' # Study Material 1
+        './KB/OB_CH13.pptx' :''  # Study Material 1
     }
 ]
 
@@ -140,8 +146,6 @@ print("Starting Study Session...") ### Intro
 time.sleep(initDelay) # give servers & sensors time to start up
 
 while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
-# todo 'q' to quit
-# also todo model auto populate the list
     sensorData = Sense()
     print(sensorData)
 
@@ -153,9 +157,10 @@ while sensors[0].poll() == None: ### Main loop, ends when FaceTracker is stopped
     time.sleep(iterDelay)
 EndStudySession() ### End of study: Summarize and append to StudyHistory.txt, then use that to create new knowledge
 
-for s in sensors[1:]:
-    ffmpeg.terminate() # ffmpeg sometimes doesnt terminate, so just spam it 
-    s.terminate()
+ffmpeg.terminate() # ffmpeg sometimes doesnt terminate, so just spam it 
+for s in sensors[1:]: s.terminate()
 for f in procs.values(): f.close() 
 
 print("\nExiting...\n")
+
+# todo 'q' to quit
