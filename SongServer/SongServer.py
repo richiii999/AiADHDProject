@@ -2,9 +2,7 @@
 # Formats API requests to the OpenWebUI docker image
 
 import requests # TODO check incoming MSG for http request, unpack the prompt from that and repack the response and return to sender
-import subprocess
 import socket
-import json
 
 def MyIP(): # From https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib#166589
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -32,8 +30,8 @@ def Send(socket, msg): socket[0].send(msg.encode())
 def Recieve(socket) -> str: return socket[0].recv(8192).decode() # default 1024, changed to 8192 but it seems the max incoming is 4095
 
 
-models = [] # list
-for model in requests.get('http://localhost:11434/api/tags').json()['models']: models.append(model['name'])
+models = [] 
+for model in requests.get('http://localhost:11434/api/tags').json()['models']: models.append(model['name']) # TODO: if there are no models (e.g. first setup), print error
 
 APIKey = ""
 with open('.webui_admin_key', 'a') as f: pass # Create file if it doesnt exist (write only bruh)
@@ -60,7 +58,7 @@ def chat_with_model(prompt) -> str:
       "model": models[modelNum],
       "messages": [{"role":"user","content":prompt}]
     }
-    return requests.post(url, headers=defaultHeader, json=data).json()
+    return requests.post(url, headers=defaultHeader, json=data).json()['choices'][0]['message']['content']
 
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i,val) for i, val in (enumerate(models))]) + "\n>", [str(i) for i in range(len(models))]))
 
@@ -78,11 +76,7 @@ try:
         print(f"<- {client[1][0]} len {len(MSG)}: {MSG}")
 
         response = chat_with_model(MSG)
-        print(response) # ['choices'][0]['message']['content']
         
-        import time
-        time.sleep(5500)
-
         Send(client, response)
         print(f"-> {client[1][0]}: {response}")
 except KeyboardInterrupt: 
