@@ -4,6 +4,7 @@
 import requests # TODO check incoming MSG for http request, unpack the prompt from that and repack the response and return to sender
 import subprocess
 import socket
+import json
 
 def MyIP(): # From https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib#166589
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -24,18 +25,15 @@ SERVER_HOST = MyIP() # Default 192.168.0.200
 # 192.168.0.200 - .100 other pc
 
 SERVER_PORT = 3001
-DockerPort = 3000
+WebUIPort = 8080
 # 8080 - OpenWebUI port (not docker)
 
 def Send(socket, msg): socket[0].send(msg.encode())
 def Recieve(socket) -> str: return socket[0].recv(8192).decode() # default 1024, changed to 8192 but it seems the max incoming is 4095
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Allow reusable ports, to not force a 30s wait for the port to clear
-server.bind((SERVER_HOST, SERVER_PORT))
-print(f"TCP Listening on {SERVER_HOST}:{SERVER_PORT}")
 
-models = [] + subprocess.check_output("ollama list | grep -v NAME | awk '{print $1}'", shell=True).decode('utf-8').split('\n')[:-1]
+models = [] # list
+for model in requests.get('http://localhost:11434/api/tags').json()['models']: models.append(model['name'])
 
 APIKey = ""
 with open('.webui_admin_key', 'a') as f: pass # Create file if it doesnt exist (write only bruh)
@@ -57,16 +55,21 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification
     return i
 
 def chat_with_model(prompt) -> str:
-    url = f'http://{SERVER_HOST}:{DockerPort}/api/chat/completions'
+    url = f'http://{SERVER_HOST}:{WebUIPort}/api/chat/completions'
     data = {
       "model": models[modelNum],
       "messages": [{"role":"user","content":prompt}]
     }
-    return requests.post(url, headers=defaultHeader, json=data).json()['choices'][0]['message']['content']
+    return requests.post(url, headers=defaultHeader, json=data).json()
 
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i,val) for i, val in (enumerate(models))]) + "\n>", [str(i) for i in range(len(models))]))
 
 try: 
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Allow reusable ports, to not force a 30s wait for the port to clear
+    server.bind((SERVER_HOST, SERVER_PORT))
+    print(f"TCP Listening on {SERVER_HOST}:{SERVER_PORT}")
+
     while True: # Main Loop
         server.listen()
         client = server.accept() # recieve (conn, addr) from client
@@ -75,7 +78,11 @@ try:
         print(f"<- {client[1][0]} len {len(MSG)}: {MSG}")
 
         response = chat_with_model(MSG)
+        print(response) # ['choices'][0]['message']['content']
         
+        import time
+        time.sleep(5500)
+
         Send(client, response)
         print(f"-> {client[1][0]}: {response}")
 except KeyboardInterrupt: 
