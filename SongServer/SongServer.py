@@ -5,33 +5,33 @@ import requests
 import subprocess
 import socket
 
+def MyIP(): # From https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib#166589
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try: # doesn't even have to be reachable
+        s.connect(('10.254.254.254', 1))
+        IP = s.getsockname()[0]
+    except Exception: IP = '127.0.0.1'
+    finally: s.close()
+    return IP
+
 # BUG: Newlines as part of the recieved msg seem to cause issues
 # BUG: There is a max msg length, setting the .recv() to greater than 1024 doesnt increase this. It's about 10 full lines of text on the terminal
     # When the msg is very long, it seems to recieve 2 pkts as one prompt, which is fine, but still not enough for very long msg (>2048)
 
-SERVER_HOST = "192.168.0.200"
+SERVER_HOST = MyIP() # Default 192.168.0.200
 # 172.17.0.2    - Docker IP addr, doesnt work
-# 192.168.0.200 - ip addr, works locally
-# localhost     - Works locally ofc
+# 192.168.0.200 - .100 other pc
 
 SERVER_PORT = 3001
 DockerPort = 3000
-# 3000 - Docker port for the OpenWebUI container
 # 8080 - OpenWebUI port (not docker)
 
 def Send(socket, msg): socket[0].send(msg.encode())
-def Recieve(socket) -> str: 
-    data = ''
-    while True: # default chunksize 1024, changed to 2048 but it seems the max incoming is 1448
-        print("before rec")
-        datachunk = socket[0].recv(1024).decode()  # reads data chunk from the socket in batches using method recv() until it returns an empty string
-        print("-> " + datachunk)
-        if not datachunk: break  # no more data coming in, so break out of the while loop
-        data += datachunk  # add chunk to your already collected data
-    return data
+def Recieve(socket) -> str: return socket[0].recv(8192).decode() # default 1024, changed to 8192 but it seems the max incoming is 4095
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Allow reusable ports, to make restarting not force a 30s wait for the port to clear
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Allow reusable ports, to not force a 30s wait for the port to clear
 server.bind((SERVER_HOST, SERVER_PORT))
 print(f"TCP Listening on {SERVER_HOST}:{SERVER_PORT}")
 
@@ -72,16 +72,18 @@ def chat_with_model(prompt) -> str:
 
 modelNum = int(UserInput("Please select a model # from the list:\n" + '\n'.join(['{}: {}'.format(i,val) for i, val in (enumerate(models))]) + "\n>", [str(i) for i in range(len(models))]))
 
-while True: # Main Loop
-    server.listen()
-    client = server.accept() # recieve (conn, addr) from client
-    
-    MSG = Recieve(client) 
-    print(f"<- {client[1][0]}: {MSG}")
+try: 
+    while True: # Main Loop
+        server.listen()
+        client = server.accept() # recieve (conn, addr) from client
+        
+        MSG = Recieve(client) 
+        print(f"<- {client[1][0]} (len = {len(MSG)}): {MSG}")
 
-    response = chat_with_model(MSG)
-    
-    Send(client, response)
-    print(f"-> {client[1][0]}: {response}")
-
-server.bind
+        response = chat_with_model(MSG)
+        
+        Send(client, response)
+        print(f"-> {client[1][0]}: {response}")
+except KeyboardInterrupt: 
+    server.close()
+    print("Exiting...")
