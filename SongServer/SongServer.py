@@ -56,17 +56,11 @@ def UserInput(inputPrompt, validinput=None) -> str: # User input verification
         i = input(inputPrompt)
     return i
 
-def sanitize(s) -> str: # Sanitize input
-    s.replace('"','')
-    s.replace("'",'')
-    return s
-
 def chat_with_model(prompt) -> str:
     url = f'http://{SERVER_HOST}:{DockerPort}/api/chat/completions'
-    print(prompt)
     data = {
       "model": models[modelNum],
-      "messages": [{"role":"user","content":sanitize(prompt)}]
+      "messages": [{"role":"user","content":prompt}]
     }
     return requests.post(url, headers=defaultHeader, json=data).json()['choices'][0]['message']['content']
 
@@ -78,7 +72,7 @@ try:
         client = server.accept() # recieve (conn, addr) from client
         
         MSG = Recieve(client) 
-        print(f"<- {client[1][0]} (len = {len(MSG)}): {MSG}")
+        print(f"<- {client[1][0]} len {len(MSG)}: {MSG}")
 
         response = chat_with_model(MSG)
         
