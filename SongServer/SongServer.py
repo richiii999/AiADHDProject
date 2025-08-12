@@ -1,7 +1,7 @@
 ### API.py
 # Formats API requests to the OpenWebUI docker image
 
-import requests
+import requests # TODO check incoming MSG for http request, unpack the prompt from that and repack the response and return to sender
 import subprocess
 import socket
 
@@ -17,7 +17,7 @@ def MyIP(): # From https://stackoverflow.com/questions/166506/finding-local-ip-a
 
 # BUG: Newlines as part of the recieved msg seem to cause issues
 # BUG: There is a max msg length, setting the .recv() to greater than 1024 doesnt increase this. It's about 10 full lines of text on the terminal
-    # When the msg is very long, it seems to recieve 2 pkts as one prompt, which is fine, but still not enough for very long msg (>2048)
+    # When the msg is very long, it seems to recieve 2 pkts as one prompt, which is fine, but still not enough for very long msg (>4095)
 
 SERVER_HOST = MyIP() # Default 192.168.0.200
 # 172.17.0.2    - Docker IP addr, doesnt work
