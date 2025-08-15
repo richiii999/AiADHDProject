@@ -64,4 +64,6 @@ Cloud-based Models: go to OpenWebUI (default http://localhost:8080/) and do the 
   - remove the top / bottom html stuff
   - Once imported, click the gear 'valves' and insert your Anthropic API key, turn it on
 
-**Acknowledgements** This research was conducted as part of the Summer Undergraduate Research Experience (SURE) program at UMD
+**Acknowledgements** 
+
+This research was conducted as part of the Summer Undergraduate Research Experience (SURE) program at UMD
