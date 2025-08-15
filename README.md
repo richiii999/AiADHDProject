@@ -1,7 +1,6 @@
 # **FOCUS**: An Agentic AI Framework for Helping ADHD Students Learn More Effectively
 
-<img width="1803" height="1436" alt="image" src="https://github.com/user-attachments/assets/8f1c171e-f154-495f-a787-d632e45876a2" />
-
+![SUREPoster_smol](https://github.com/user-attachments/assets/494c5d19-cf56-45af-a053-41dbecce7ee8)
 
 **Installation & Usage**
 1. Clone the repo
