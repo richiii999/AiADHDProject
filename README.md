@@ -67,4 +67,4 @@ Cloud-based Models: go to OpenWebUI (default http://localhost:8080/) and do the 
 
 **Acknowledgements** 
 
-This research was conducted as part of the Summer Undergraduate Research Experience (SURE) program at UMD
+This research was supported by the Summer Undergraduate Research Experience (SURE) program at UMD
