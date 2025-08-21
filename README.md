@@ -61,9 +61,8 @@ Cloud-based Models: go to OpenWebUI (default http://localhost:8080/) and do the 
 - OpenAI: Profile > Admin Panel > Settings > Connections > "Manage OpenAI API Connections" set to ON
    - Add the endpoint (ex. "https://api.openai.com/v1") and enter your API Key
 - Claude: Download this function: https://openwebui.com/f/justinrahb/anthropic
-  - "Import from file" on http://localhost:8080/admin/functions 
-  - remove the top / bottom html stuff
-  - Once imported, click the gear 'valves' and insert your Anthropic API key, turn it on
+  - "Import to WebUI", input your webui URL.
+  - Once imported, click the gear 'valves' and insert your Anthropic API key, turn it on.
 
 **Acknowledgements** 
 
