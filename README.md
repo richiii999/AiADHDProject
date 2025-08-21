@@ -48,7 +48,7 @@
 
 **Setting up models**
 
-FOCUS was tested with llama3.2:1b, llama3.2:8b, and claude 4 sonnet.
+FOCUS was tested with llama3.2:1b, llama3.2:latest, and claude 4 sonnet.
 
 Local Models: install ollama to run local models via OpenWebUI
 - Manual: curl -fsSL https://ollama.com/install.sh | sh
