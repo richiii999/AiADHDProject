@@ -17,7 +17,7 @@ with open('.webui_admin_key', 'r+') as f: # Re-open in read/write mode
 
 localHostPort = "8080"
 defaultHeader = {'Authorization':f'Bearer {adminToken}','Content-Type':'application/json'}
-Models = ["justinrahb.claude-3-7-sonnet-20250219"] # default Cloud-based model
+Models = ["anthropic.claude-3-7-sonnet-20250219"] # default Cloud-based model
 
 
 # Thanks to https://github.com/open-webui/open-webui/discussions/11761
